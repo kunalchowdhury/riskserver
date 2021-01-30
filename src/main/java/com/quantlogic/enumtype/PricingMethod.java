@@ -1,15 +1,22 @@
 package com.quantlogic.enumtype;
 
-public enum PricingMethod {
-    Black_Scholes,
-    Heston_Semi_Analytic,
-    Heston_COS_Method,
-    Heston_Time_Dependent_Parameter,
-    Bates_Semi_Analytic,
-    Barone_Adesi_Whaley,
-    Bjerksund_Stensland,
-    Integral,
-    Finite_Differences,
-    Binomial_Jarrow_Rudd
+import com.quantlogic.builder.pricingengine.BinomialCRRVanillaEngineBuilder;
+import com.quantlogic.builder.pricingengine.BinomialJ4VanillaEngineBuilder;
+import com.quantlogic.builder.pricingengine.BinomialLRVanillaEngineBuilder;
+import com.quantlogic.builder.PricingEngineBuilder;
 
+public enum PricingMethod {
+    BinomialLeisenReimer(new BinomialLRVanillaEngineBuilder()),
+    BinomialCoxRossRubinstein(new BinomialCRRVanillaEngineBuilder()),
+    BinomialJoshi(new BinomialJ4VanillaEngineBuilder());
+
+    private final PricingEngineBuilder pricingEngineBuilder;
+
+    PricingMethod(PricingEngineBuilder pricingEngineBuilder) {
+        this.pricingEngineBuilder = pricingEngineBuilder;
+    }
+
+    public PricingEngineBuilder getPricingEngineBuilder() {
+        return pricingEngineBuilder;
+    }
 }

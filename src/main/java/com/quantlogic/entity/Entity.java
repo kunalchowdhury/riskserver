@@ -5,4 +5,6 @@ public interface Entity {
     Type getType();
     int getId();
     String getName();
+    int getVersion();
+    long insertTime();
 }

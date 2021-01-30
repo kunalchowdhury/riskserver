@@ -1,16 +1,25 @@
-package com.quantlogic.builder;
+package com.quantlogic.builder.yieldtermcurve;
 
+import com.quantlogic.builder.Builder;
 import com.quantlogic.enumtype.DayCount;
 import com.quantlogic.enumtype.YieldTermType;
+import org.quantlib.YieldTermStructure;
 import org.quantlib.YieldTermStructureHandle;
 
 import java.time.Month;
 
-public class YieldTermStructureBuilder implements Builder{
-    private Builder builder;
+public class YieldTermStructureBuilder implements Builder<YieldTermStructureHandle> {
+    private Builder<?> builder;
     private YieldTermType yieldTermType ;
 
-    public YieldTermStructureBuilder(YieldTermType yieldTermType) {
+    public YieldTermStructureBuilder(){}
+
+    public YieldTermStructureBuilder withFlatForwardBuilder(FlatForwardBuilder flatForwardBuilder){
+        this.builder = flatForwardBuilder;
+        return this;
+    }
+
+    public YieldTermStructureBuilder withType(YieldTermType yieldTermType) {
         this.yieldTermType = yieldTermType;
         switch (yieldTermType){
             case FlatForward:
@@ -21,6 +30,7 @@ public class YieldTermStructureBuilder implements Builder{
             default:
                 throw new IllegalStateException("Unexpected value: " + yieldTermType);
         }
+        return this;
     }
 
     public YieldTermStructureBuilder withRiskFreeRate(double riskFreeRate){
@@ -79,13 +89,7 @@ public class YieldTermStructureBuilder implements Builder{
     }
 
     public YieldTermStructureHandle build(){
-        switch (yieldTermType) {
-            case FlatForward:
-                return new YieldTermStructureHandle(((FlatForwardBuilder)builder).build());
-            case DiscountCurve:
-                break;
-        }
-        throw new IllegalStateException();
+        return new YieldTermStructureHandle((YieldTermStructure) builder.build());
     }
 
 

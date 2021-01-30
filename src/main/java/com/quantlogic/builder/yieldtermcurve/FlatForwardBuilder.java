@@ -1,11 +1,12 @@
-package com.quantlogic.builder;
+package com.quantlogic.builder.yieldtermcurve;
 
+import com.quantlogic.builder.Builder;
 import com.quantlogic.enumtype.DayCount;
 import org.quantlib.*;
 
 import java.time.Month;
 
-public class FlatForwardBuilder implements Builder {
+public class FlatForwardBuilder implements Builder<FlatForward> {
     private int day;
     private Month month;
     private int year;

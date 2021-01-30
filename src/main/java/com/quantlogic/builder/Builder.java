@@ -1,4 +1,5 @@
 package com.quantlogic.builder;
 
-public interface Builder {
+public interface Builder<T> {
+    T build();
 }
