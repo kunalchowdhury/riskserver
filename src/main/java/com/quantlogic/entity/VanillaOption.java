@@ -16,13 +16,30 @@ public class VanillaOption extends Instrument{
     private DayCount dayCount;
     private OptionType optionType;
     private ExcerciseType excerciseType;
-    private int version;
     private String tickerSymbol;
-    private long insertTime;
 
 
-    public VanillaOption(int id, String name) {
-        super(id, name);
+
+    public VanillaOption(int id, String name, int version, long insertTime) {
+        super(id, name, version, insertTime);
+    }
+
+    public VanillaOption(int id, String name, double strike, double underlying, double riskFreeRate, double dividendYield,
+                         double volatility, long settlementDate, long maturity, DayCount dayCount, OptionType optionType,
+                         ExcerciseType excerciseType, int version, String tickerSymbol, long insertTime) {
+        super(id, name,  version, insertTime);
+        this.strike = strike;
+        this.underlying = underlying;
+        this.riskFreeRate = riskFreeRate;
+        this.dividendYield = dividendYield;
+        this.volatility = volatility;
+        this.settlementDate = settlementDate;
+        this.maturity = maturity;
+        this.dayCount = dayCount;
+        this.optionType = optionType;
+        this.excerciseType = excerciseType;
+        this.tickerSymbol = tickerSymbol;
+
     }
 
     public double getStrike() {
@@ -67,16 +84,6 @@ public class VanillaOption extends Instrument{
 
     public String getTickerSymbol() {
         return tickerSymbol;
-    }
-
-    @Override
-    public int getVersion() {
-        return version;
-    }
-
-    @Override
-    public long insertTime() {
-        return insertTime;
     }
 
 

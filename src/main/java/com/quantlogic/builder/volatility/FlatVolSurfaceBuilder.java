@@ -16,20 +16,28 @@ public class FlatVolSurfaceBuilder extends VolatilitySurfaceBuilder {
     public FlatVolSurfaceBuilder() {
     }
 
-    public FlatVolSurfaceBuilder withSettlementDate(long settlementDateInMillis){
+    public FlatVolSurfaceBuilder withSettlementDate(long settlementDateInMillis) {
         this.settlementDate = DateUtil.fromEpochMillis(settlementDateInMillis);
         return this;
     }
 
-    public FlatVolSurfaceBuilder withCalendar(long settlementDateInMillis){
+    public FlatVolSurfaceBuilder withCalendar(long settlementDateInMillis) {
         this.settlementDate = DateUtil.fromEpochMillis(settlementDateInMillis);
         return this;
     }
 
+    public FlatVolSurfaceBuilder withDayCounter(DayCounter dayCounter) {
+        this.dayCounter = dayCounter;
+        return this;
+    }
 
+    public FlatVolSurfaceBuilder withVolatility(double volatility) {
+        this.volatility = volatility;
+        return this;
+    }
 
     @Override
     public BlackConstantVol build() {
-        return null;
+        return new BlackConstantVol(settlementDate, calendar, volatility, dayCounter);
     }
 }

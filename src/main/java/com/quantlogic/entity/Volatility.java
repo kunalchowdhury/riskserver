@@ -1,13 +1,12 @@
 package com.quantlogic.entity;
 
-public abstract class Instrument implements Entity{
+public abstract class Volatility implements Entity{
     private final int id;
     private final String name;
     private final int version;
     private final long insertTime;
 
-
-    public Instrument(int id, String name, int version, long insertTime) {
+    public Volatility(int id, String name, int version, long insertTime) {
         this.id = id;
         this.name = name;
         this.version = version;
@@ -16,7 +15,7 @@ public abstract class Instrument implements Entity{
 
     @Override
     public Type getType() {
-        return Type.INSTRUMENT;
+        return Type.VOLATILITY_SURFACE;
     }
 
     @Override
@@ -36,10 +35,6 @@ public abstract class Instrument implements Entity{
 
     @Override
     public long insertTime() {
-        return insertTime;
-    }
-
-    public long getInsertTime() {
         return insertTime;
     }
 }

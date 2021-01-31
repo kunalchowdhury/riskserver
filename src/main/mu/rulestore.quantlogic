@@ -1,0 +1,3 @@
+vol_QQQ_1_1 = ($underlying == "QQQ" && ($tickerSymbol == "QWQ" || $qty == 100)) ? getFlatVolKey(QQQ, AS) : "BlackVariance|$underlying|2021"
+vol_QQQ_1_2 = ($tickerSymbol == "QQQ") ? "FlatVol|$tickerSymbol|2021" : getFlatVolKey(QQQ, 202020102)
+vol_AAPL_2_1 = ($tickerSymbol == "AAPL") ? "FlatVol|AAPL|2021" : "BlackVariance|$underlying|2021"
