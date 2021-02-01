@@ -1,12 +1,10 @@
 package com.quantlogic.entity;
 
-import org.quantlib.*;
 import org.quantlib.VanillaOption;
+import org.quantlib.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoField;
 
 public class EntityTest {
     public static void main(String[] args) {
@@ -48,6 +46,7 @@ public class EntityTest {
         Date maturity = new Date(17, Month.May, 1999);
         DayCounter dayCounter = new Actual365Fixed();
         Calendar calendar = new UnitedStates(UnitedStates.Market.NYSE);
+
 
 
         DateVector expirations = new DateVector(new Date[]{new Date(20, Month.December, 2013),
