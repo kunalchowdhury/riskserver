@@ -13,6 +13,8 @@ public final class ReflectionUtils {
 
     private static final Map<Class<?>, Map<String, Method>> entityGetterMap = Maps.newConcurrentMap();
     private static final Map<Class<?>, Function<?, String>> canonName = Maps.newHashMap();
+    private static final ThreadLocal<StringBuilder> EQUALS_BUILDER = new ThreadLocal<StringBuilder>(){};
+
     static {
         canonName.put(Boolean.class, (Function<String, String>) s -> "Boolean.valueOf("+s+")");
         canonName.put(Byte.class, (Function<String, String>) s -> "Byte.valueOf("+s+")");
@@ -41,11 +43,9 @@ public final class ReflectionUtils {
 
     public static String generateEqualsStatement(Class<?> clsName, String curInstanceName, String fldName, String targetFldName){
         Method methodName = getMethodName(clsName, fldName);
-        StringBuilder sb = new StringBuilder(curInstanceName)
-                .append(".")
-                .append(methodName.getName())
-                .append("equals(");
-
+        StringBuilder sb = EQUALS_BUILDER.get();
+        sb.delete(0, sb.length());
+        sb.append(curInstanceName).append(".").append(methodName.getName()).append("equals(");
         String returnValue ;
         if(methodName.getReturnType() != Enum.class){
             Function<String, String> stringFunction = (Function<String, String>) canonName.get(methodName.getReturnType());
