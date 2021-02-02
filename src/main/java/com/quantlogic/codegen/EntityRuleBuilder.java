@@ -1,20 +1,25 @@
 package com.quantlogic.codegen;
 
+import com.quantlogic.rules.DefaultInstrumentVolatilityRuleSet;
 import javassist.*;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class EntityRuleBuilder {
-    private String clsName;
+    private final DefaultInstrumentVolatilityRuleSet defaultInstrumentVolatilityRuleSet;
     public CtClass cc ;
     private ClassPool cp ;
+    private AtomicInteger ruleId = new AtomicInteger();
 
     public EntityRuleBuilder() {
         this.cp = ClassPool.getDefault();
         cp.importPackage("com.quantlogic.entity");
+        defaultInstrumentVolatilityRuleSet = new DefaultInstrumentVolatilityRuleSet(ruleId.incrementAndGet());
     }
 
     public EntityRuleBuilder withRuleName(String ruleName) throws NotFoundException {
-        this.clsName = ruleName.replaceAll("_", "");
-        this.cc = cp.makeClass("com.quantlogic.codegen.rules.Rule"+clsName);
+        String clsName = ruleName.replaceAll("_", "");
+        this.cc = cp.makeClass("com.quantlogic.codegen.rules.Rule"+ clsName);
         this.cc.setInterfaces(new CtClass[]{cp.get("com.quantlogic.entity.EntityRule")});
         return this;
     }

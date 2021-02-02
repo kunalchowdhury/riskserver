@@ -1,5 +1,10 @@
-package mu;
+package com.quantlogic.rule.grammar;
+
+import com.quantlogic.rules.QuantlogicBaseVisitor;
+import com.quantlogic.rules.QuantlogicParser;
+
 public class TestAntlr extends QuantlogicBaseVisitor<String> {
+
     @Override
     public String visitBooleanAtom(QuantlogicParser.BooleanAtomContext ctx) {
         return super.visitBooleanAtom(ctx);

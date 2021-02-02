@@ -1,5 +1,8 @@
-package mu;
+package com.quantlogic.rule.grammar;
 
+
+import com.quantlogic.rules.QuantlogicLexer;
+import com.quantlogic.rules.QuantlogicParser;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -10,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
-            args = new String[]{"src/main/mu/rulestore.quantlogic"};
+            args = new String[]{"src/main/resources/rules/rulestore.quantlogic"};
         }
 
         System.out.println("parsing: " + args[0]);
@@ -21,7 +24,7 @@ public class Main {
         TestAntlr visitor = new TestAntlr();
         visitor.visit(tree);
     }
-    public static void main1(String[] args) throws Exception {
+   /* public static void main1(String[] args) throws Exception {
 
         if (args.length == 0) {
             args = new String[]{"src/main/mu/test.mu"};
@@ -34,5 +37,5 @@ public class Main {
         ParseTree tree = parser.parse();
         EvalVisitor visitor = new EvalVisitor();
         visitor.visit(tree);
-    }
+    }*/
 }
