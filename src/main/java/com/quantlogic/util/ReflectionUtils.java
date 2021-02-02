@@ -36,7 +36,12 @@ public final class ReflectionUtils {
     }
 
     private final Map<Class<?>, Map<String, Method>> entityGetterMap = Maps.newConcurrentMap();
-    private final ThreadLocal<StringBuilder> EQUALS_BUILDER = new ThreadLocal<StringBuilder>(){};
+    private final ThreadLocal<StringBuilder> EQUALS_BUILDER = new ThreadLocal<StringBuilder>(){
+        @Override
+        protected StringBuilder initialValue() {
+            return new StringBuilder();
+        }
+    };
     private final Map<String, Set<Method>> methodMap ;
 
     private ReflectionUtils() {
@@ -58,22 +63,24 @@ public final class ReflectionUtils {
         entityGetterMap.putIfAbsent(clsName,
                 Arrays.stream(clsName.getDeclaredMethods())
                 .collect(Collectors.toMap(
-                        method -> method.getName().replace("get", "").toLowerCase(),
+                        method -> method.getName().substring(method.getName().lastIndexOf(".") + 1).replace("get", "").toLowerCase(),
                         method -> method
                         )
                 ));
-        return entityGetterMap.get(clsName).get(fldName);
+        return entityGetterMap.get(clsName).get(fldName.toLowerCase());
     }
 
     public Class<?> getReturnType(Class<?> clsName, String fldName){
         return getMethodName(clsName, fldName).getReturnType();
     }
 
-    public String generateEqualsStatement(Class<?> clsName, String curInstanceName, String fldName, String targetFldName){
-        Method methodName = getMethodName(clsName, fldName);
+    public String generateEqualsStatement(Class<?> clsName, String curInstanceName, String stmt){
+        String[] fields = stmt.split("==");
+        String targetFldName = fields[1].trim();
+        Method methodName = getMethodName(clsName, fields[0].replace("$", "").trim());
         StringBuilder sb = EQUALS_BUILDER.get();
         sb.delete(0, sb.length());
-        sb.append(curInstanceName).append(".").append(methodName.getName()).append("equals(");
+        sb.append(curInstanceName).append(".").append(methodName.getName()).append("()").append(".").append("equals(");
         String returnValue ;
         if(methodName.getReturnType() != Enum.class){
             Function<String, String> stringFunction = (Function<String, String>) canonName.get(methodName.getReturnType());
