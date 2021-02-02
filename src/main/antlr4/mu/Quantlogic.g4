@@ -92,7 +92,7 @@ STRING
  ;
 
 FUNCTION
- : [a-zA-Z_0-9]+ ('(')+ ~[:\r\n]*  (')')
+ : ([a-zA-Z_0-9]+('.')[a-zA-Z_0-9]+)+ ('(')+ ~[:\r\n]*  (')')
  ;
 
 COMMENT
@@ -103,6 +103,3 @@ SPACE
  : [ \t\r\n] -> skip
  ;
 
-OTHER
- : .
- ;

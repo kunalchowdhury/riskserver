@@ -4,9 +4,24 @@ import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.IOException;
+
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            args = new String[]{"src/main/mu/rulestore.quantlogic"};
+        }
+
+        System.out.println("parsing: " + args[0]);
+
+        QuantlogicLexer lexer = new QuantlogicLexer(new ANTLRFileStream(args[0]));
+        QuantlogicParser parser = new QuantlogicParser(new CommonTokenStream(lexer));
+        ParseTree tree = parser.parse();
+        TestAntlr visitor = new TestAntlr();
+        visitor.visit(tree);
+    }
+    public static void main1(String[] args) throws Exception {
 
         if (args.length == 0) {
             args = new String[]{"src/main/mu/test.mu"};
