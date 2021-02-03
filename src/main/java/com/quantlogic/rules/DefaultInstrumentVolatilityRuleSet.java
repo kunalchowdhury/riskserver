@@ -22,7 +22,7 @@ public class DefaultInstrumentVolatilityRuleSet extends EntityRuleSet<Instrument
 
     public DefaultInstrumentVolatilityRuleSet(int ruleSetId) {
         this.ruleSetId = ruleSetId;
-        this.ruleCache = CacheBuilder.newBuilder().concurrencyLevel(concurrency).build();
+        this.ruleCache = CacheBuilder.newBuilder().concurrencyLevel(1).build();
         this.subject = PublishSubject.create();
         this.listener = new RuleProcessorListener<Instrument, Volatility>(){
             @Override

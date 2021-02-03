@@ -109,7 +109,7 @@ public final class ReflectionUtils {
             if(method.isPresent()){
                 String[] params = command.substring(command.indexOf('(') +1 , command.indexOf(")")).split(",");
                 Parameter[] parameters = method.get().getParameters();
-                StringBuilder sb = new StringBuilder(clsName).append(methodName).append(".(");
+                StringBuilder sb = new StringBuilder(clsName).append(".").append(methodName).append("(");
                 if(params.length == parameters.length){
                     IntStream.range(0 , parameters.length).forEach(i -> {
                         if(parameters[i].getType() != Enum.class){

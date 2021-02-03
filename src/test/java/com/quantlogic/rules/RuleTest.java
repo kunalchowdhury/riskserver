@@ -15,7 +15,7 @@ public class RuleTest {
         ReflectionUtils utils =  ReflectionUtils.INSTANCE;
         Optional<String> s1 = utils.generateMethodCallStatement(s.replaceAll("\"",""));
         Assert.assertTrue(s1.isPresent());
-        Assert.assertEquals("com.quantlogic.util.VolKeygenUtilgetFlatVolKey.(String.valueOf(\"QQQ\"),String.valueOf(\"20201202\"),String.valueOf(\".SPX\"))", s1.get());
+        Assert.assertEquals("com.quantlogic.util.VolKeygenUtil.getFlatVolKey(String.valueOf(\"QQQ\"),String.valueOf(\"20201202\"),String.valueOf(\".SPX\"))", s1.get());
 
     }
 
