@@ -19,8 +19,6 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
     protected final AtomicInteger ruleId = new AtomicInteger();
     private final ClassPool cp;
     public CtClass cc;
-    private String type;
-    private String classname;
 
 
     public EntityRuleBuilder(EntityRuleSet<T, U> entityRuleSet) {
@@ -31,20 +29,6 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         cp.importPackage("com.quantlogic.rules.FunctionPredicate");
         this.entityRuleSet = entityRuleSet;
     }
-
-    public static void main1(String[] args) {
-      //  RuleTest100 r = new RuleTest100();
-       // System.out.println(r);
-    }
-
-   /* static class CurPred implements Predicate{
-
-        @Override
-        public boolean test(Object o) {
-             EntityRuleBuilder.this.withRuleName("as");
-             return true;
-        }
-    }*/
 
     public static void main(String[] args) throws Exception {
         EntityRuleBuilder<Instrument, Volatility> entityRuleBuilder = new EntityRuleBuilder<Instrument, Volatility>(new DefaultInstrumentVolatilityRuleSet(1)) {
@@ -61,13 +45,9 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         String s = "getSource().getTickerSymbol().equals(String.valueOf(\"OTC123\"))";
         String s1 = "com.quantlogic.util.VolKeygenUtil.getFlatVolKey(String.valueOf(\"QQQ\"),String.valueOf(\"20201202\"),String.valueOf(\".SPX\"))";
         entityRuleBuilder.withPredicate(s, s1);
-        //entityRuleBuilder.cc.defrost();
-        //CtClass curFunction = entityRuleBuilder.cc.makeNestedClass("CurFunction", true);
         entityRuleBuilder.cc.writeFile("target/classes");
 
         EntityRule er = (EntityRule) entityRuleBuilder.cc.toClass().newInstance();
-        //RuleTest100 ruleTest100 = new RuleTest100();
-        System.out.println(er);
     }
 
     public EntityRuleBuilder<T, U> withSourceAndTarget(Pair<String, String> src, Pair<String, String> target) throws CannotCompileException {
@@ -77,7 +57,7 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
                 return false;
             }
         };
-        this.type = src.getKey();
+        String type = src.getKey();
         CtField f = CtField.make("public " + src.getKey() + " " + src.getValue() + " ;", cc);
         cc.addField(f);
         f = CtField.make("public " + target.getKey() + " " + target.getValue() + " ;", cc);
@@ -99,7 +79,7 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
 
     public EntityRuleBuilder<T, U> withRuleName(String ruleName) throws NotFoundException {
         String clsName = ruleName.replaceAll("_", "");
-        this.classname = "com.quantlogic.codegen.rules.Rule" + clsName;
+        String classname = "com.quantlogic.codegen.rules.Rule" + clsName;
         this.cc = cp.makeClass(classname);
         this.cc.setInterfaces(new CtClass[]{cp.get("com.quantlogic.entity.EntityRule")});
         return this;
@@ -123,19 +103,10 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         return this;
     }
 
-    public Predicate getPredicate() {
-        return new Predicate() {
-            public boolean test(Object t) {
-                return ((com.quantlogic.entity.VanillaOption) t).getTickerSymbol().equals(String.valueOf("OTC123"));
-            }
-        };
-    }
-
     public EntityRuleBuilder<T, U> withPredicate(String predicate, String object) throws Exception {
         CtField f = CtField.make("public com.quantlogic.rules.FunctionPredicate fpredicate ;", cc);
         cc.addField(f);
 
-        // = new com.quantlogic.rules.FunctionPredicate("+ predicate+" , " + object+" )
         CtMethod method = CtMethod.make("public com.quantlogic.rules.FunctionPredicate getFunctionPredicate() {return new com.quantlogic.rules.FunctionPredicate("+ predicate+ " , " + object+" );}", cc);
         cc.addMethod(method);
 
@@ -147,42 +118,6 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         method = CtMethod.make(meth, cc);
         cc.addMethod(method);
 
-
-        return this;
-    }
-
-    public EntityRuleBuilder<T, U> withPredicate1(String predicate) throws Exception {
-        CtField f = CtField.make("public com.quantlogic.rules.FunctionPredicate fpredicate = new com.quantlogic.rules.FunctionPredicate( true, \"obj\" ) ;", cc);
-        cc.addField(f);
-
-        // CtField f = CtField.make("public Object predicate = new Predicate() { public boolean test( Object t ) { return true; }};", cc);
-        // cc.addField(f);
-
-
-        //String meth = "public Predicate getPredicate(){ return new Predicate() { public boolean test( Object t ) { return true; }};}";
-        CtClass c = cc.makeNestedClass("CurPredicate", true);
-        c.addField(CtField.make("private boolean cond = false ;", c));
-        c.addConstructor(CtNewConstructor.make("public CurPredicate(boolean cond)" + " {this.cond = cond;}", c));
-        c.setInterfaces(new CtClass[]{cp.get("java.util.function.Predicate")});
-
-
-
-
-        CtMethod method = CtNewMethod.make(Modifier.PUBLIC, CtClass.booleanType, "test", new CtClass[]{cp.get("java.lang.Object")}, new CtClass[]{}, "return cond ;", c);
-        c.addMethod(method);
-        ;
-        //c.debugWriteFile("src/main/java");
-
-        CtClass parentClass = cp.getCtClass(this.classname);
-        CtClass ctClass = cp.getCtClass(this.classname + "$CurPredicate");
-        String meth = "public java.util.function.Predicate getPredicate(){ return new "+ this.classname + "$CurPredicate" +"(getSource()."+predicate+");}";
-        CtMethod method1 = CtMethod.make(meth, parentClass);
-        parentClass.addMethod(method1);
-        cc = parentClass;
-
-        parentClass = cp.getCtClass(this.classname);
-        cc = parentClass.makeNestedClass("CurFunction", true);
-       // cc.debugWriteFile("src/main/java");
 
         return this;
     }
