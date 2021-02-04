@@ -25,7 +25,7 @@ public class RuleTest {
     }
 
     @Test
-    public void testGenerateEqualsStmt() throws Exception {
+    public void testGenerateEqualsStmt() {
         String s = "$tickerSymbol == \"OTC123\"";
         ReflectionUtils utils =  ReflectionUtils.INSTANCE;
         String s1 = utils.generateEqualsStatement(VanillaOption.class, "vanillaOpton", s.replaceAll("\"", ""));
@@ -34,23 +34,17 @@ public class RuleTest {
 
      @Test
      public void testAutogenRules() throws Exception{
-         EntityRuleBuilder<Instrument, Volatility> entityRuleBuilder = new EntityRuleBuilder<Instrument, Volatility>(new DefaultInstrumentVolatilityRuleSet(1)) {
-             @Override
-             protected EntityRule<Instrument, Volatility> buildRule() {
-                 return null;
-             }
-         };
-         entityRuleBuilder.withRuleName("Test100");
-         entityRuleBuilder.withRuleId("100");
-         entityRuleBuilder.withRuleWeight("2");
-         entityRuleBuilder.withSourceAndTarget(Pair.of("com.quantlogic.entity.VanillaOption", "instrument"),
-                 Pair.of("com.quantlogic.entity.BlackVarianceVolatilitySurface", "volatility"));
          String s = "getSource().getTickerSymbol().equals(String.valueOf(\"OTC123\"))";
          String s1 = "com.quantlogic.util.VolKeygenUtil.getFlatVolKey(String.valueOf(\"QQQ\"),String.valueOf(\"20201202\"),String.valueOf(\".SPX\"))";
-         entityRuleBuilder.withPredicate(s, s1);
-         entityRuleBuilder.cc.writeFile("target/classes");
+         EntityRuleBuilder<Instrument, Volatility> entityRuleBuilder = new EntityRuleBuilder<>(new DefaultInstrumentVolatilityRuleSet(1)) ;
+         EntityRule<Instrument, Volatility> er = entityRuleBuilder
+                 .withRuleName("Test100")
+                 .withRuleId("100")
+                 .withRuleWeight("2")
+                 .withSourceAndTarget(Pair.of("com.quantlogic.entity.VanillaOption", "instrument"),
+                 Pair.of("com.quantlogic.entity.BlackVarianceVolatilitySurface", "volatility")).withPredicate(s, s1).build();
 
-         EntityRule er = (EntityRule) entityRuleBuilder.cc.toClass().newInstance();
+         entityRuleBuilder.writeFile();
          Assert.assertNotNull(er);
      }
 }

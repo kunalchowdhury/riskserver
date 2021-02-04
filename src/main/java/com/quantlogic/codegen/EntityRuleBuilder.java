@@ -3,22 +3,18 @@ package com.quantlogic.codegen;
 import com.quantlogic.builder.Builder;
 import com.quantlogic.entity.Entity;
 import com.quantlogic.entity.EntityRule;
-import com.quantlogic.entity.Instrument;
-import com.quantlogic.entity.Volatility;
-import com.quantlogic.rules.DefaultInstrumentVolatilityRuleSet;
 import com.quantlogic.rules.EntityRuleSet;
 import javassist.*;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
-public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> implements Builder<EntityRule<T, U>> {
+public class EntityRuleBuilder<T extends Entity, U extends Entity> implements Builder<EntityRule<T, U>> {
     protected final EntityRuleSet<T, U> entityRuleSet;
     protected final AtomicInteger ruleId = new AtomicInteger();
     private final ClassPool cp;
-    public CtClass cc;
+    private CtClass cc;
 
 
     public EntityRuleBuilder(EntityRuleSet<T, U> entityRuleSet) {
@@ -30,34 +26,7 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         this.entityRuleSet = entityRuleSet;
     }
 
-    public static void main(String[] args) throws Exception {
-        EntityRuleBuilder<Instrument, Volatility> entityRuleBuilder = new EntityRuleBuilder<Instrument, Volatility>(new DefaultInstrumentVolatilityRuleSet(1)) {
-            @Override
-            protected EntityRule<Instrument, Volatility> buildRule() {
-                return null;
-            }
-        };
-        entityRuleBuilder.withRuleName("Test100");
-        entityRuleBuilder.withRuleId("100");
-        entityRuleBuilder.withRuleWeight("2");
-        entityRuleBuilder.withSourceAndTarget(Pair.of("com.quantlogic.entity.VanillaOption", "instrument"),
-                Pair.of("com.quantlogic.entity.BlackVarianceVolatilitySurface", "volatility"));
-        String s = "getSource().getTickerSymbol().equals(String.valueOf(\"OTC123\"))";
-        String s1 = "com.quantlogic.util.VolKeygenUtil.getFlatVolKey(String.valueOf(\"QQQ\"),String.valueOf(\"20201202\"),String.valueOf(\".SPX\"))";
-        entityRuleBuilder.withPredicate(s, s1);
-        entityRuleBuilder.cc.writeFile("target/classes");
-
-        EntityRule er = (EntityRule) entityRuleBuilder.cc.toClass().newInstance();
-    }
-
     public EntityRuleBuilder<T, U> withSourceAndTarget(Pair<String, String> src, Pair<String, String> target) throws CannotCompileException {
-        Predicate p = new Predicate() {
-            @Override
-            public boolean test(Object o) {
-                return false;
-            }
-        };
-        String type = src.getKey();
         CtField f = CtField.make("public " + src.getKey() + " " + src.getValue() + " ;", cc);
         cc.addField(f);
         f = CtField.make("public " + target.getKey() + " " + target.getValue() + " ;", cc);
@@ -70,7 +39,7 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         method = CtNewMethod.make(meth, cc);
         cc.addMethod(method);
 
-        meth = "public void from( Entity  t , Entity  u ) { this." + src.getValue() + " = ("+src.getKey()+")t ;" + " this." + target.getValue() + " = ("+target.getKey()+")u ;      }";
+        meth = "public void from( com.quantlogic.entity.Entity  t , com.quantlogic.entity.Entity  u ) { this." + src.getValue() + " = ("+src.getKey()+")t ;" + " this." + target.getValue() + " = ("+target.getKey()+")u ;      }";
         method = CtNewMethod.make(meth, cc);
         cc.addMethod(method);
 
@@ -122,23 +91,28 @@ public abstract class EntityRuleBuilder<T extends Entity, U extends Entity> impl
         return this;
     }
 
+    public void writeFile(){
+        try {
+            cc.writeFile("target/classes");
+        } catch (CannotCompileException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected void addRuleToSet(EntityRule<T, U> rule) {
         this.entityRuleSet.addEntityRule(rule);
     }
 
     @Override
-    public EntityRule<T, U> build() {
-        EntityRule<T, U> rule = buildRule();
+    public EntityRule<T, U> build()  {
+        EntityRule rule = null;
+        try {
+            rule = (EntityRule) this.cc.toClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException | CannotCompileException e) {
+            e.printStackTrace();
+        }
         addRuleToSet(rule);
         return rule;
     }
 
-    protected abstract EntityRule<T, U> buildRule();
-
-    static class MyF implements Function{
-        @Override
-        public Object apply(Object o) {
-            return null;
-        }
-    }
 }
