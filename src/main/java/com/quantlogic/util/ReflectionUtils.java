@@ -29,7 +29,7 @@ public final class ReflectionUtils {
         canonName.put(Byte.class, (Function<String, String>) s -> "Byte.valueOf(\""+s+"\")");
         canonName.put(Enum.class, (Function<Pair<String, String>, String>) s -> s.getLeft()+".valueOf(\""+s.getRight()+"\")");
         canonName.put(Integer.class, (Function<String, String>) s -> "Integer.valueOf(\""+s+"\")");
-        canonName.put(Float.class, (Function<String, String>) s -> "Float.valueOf(\""+s+"\")");
+        canonName.put(Float.class, (Function<String, String>) s -> "Float.class.valueOf(\""+s+"\")");
         canonName.put(Long.class, (Function<String, String>) s -> "Long.valueOf(\""+s+"\")");
         canonName.put(Double.class, (Function<String, String>) s -> "Double.valueOf(\""+s+"\")");
         canonName.put(String.class, (Function<String, String>) s -> "String.valueOf(\""+s+"\")");
@@ -74,23 +74,31 @@ public final class ReflectionUtils {
         return getMethodName(clsName, fldName).getReturnType();
     }
 
-    public String generateEqualsStatement(Class<?> clsName, String curInstanceName, String stmt){
+    public String generateEqualsStatement(Class<?> clsName, String curInstanceName, String stmt, boolean parseRight){
+        stmt = stmt.replaceAll("\"", "");
         String[] fields = stmt.split("==");
         String targetFldName = fields[1].trim();
         Method methodName = getMethodName(clsName, fields[0].replace("$", "").trim());
         StringBuilder sb = EQUALS_BUILDER.get();
         sb.delete(0, sb.length());
-        sb.append(curInstanceName).append(".").append(methodName.getName()).append("()").append(".").append("equals(");
-        String returnValue ;
-        if(methodName.getReturnType() != Enum.class){
-            Function<String, String> stringFunction = (Function<String, String>) canonName.get(methodName.getReturnType());
-            returnValue = stringFunction.apply(targetFldName);
-        }else {
-            Function<Pair<String, String>, String> enumFunction =
-                    (Function<Pair<String, String>, String>) canonName.get(methodName.getReturnType());
-            returnValue = enumFunction.apply(Pair.of(methodName.getReturnType().getCanonicalName(), targetFldName));
+        if(!StringUtils.isEmpty(curInstanceName)){
+            sb.append(curInstanceName).append(".");
         }
-        sb.append(returnValue).append(")");
+        sb.append(methodName.getName()).append("()").append(".").append("equals(");
+        if(!parseRight) {
+            sb.append(targetFldName).append(")");
+        }else {
+            String returnValue;
+            if (methodName.getReturnType() != Enum.class) {
+                Function<String, String> stringFunction = (Function<String, String>) canonName.get(methodName.getReturnType());
+                returnValue = stringFunction.apply(targetFldName);
+            } else {
+                Function<Pair<String, String>, String> enumFunction =
+                        (Function<Pair<String, String>, String>) canonName.get(methodName.getReturnType());
+                returnValue = enumFunction.apply(Pair.of(methodName.getReturnType().getCanonicalName(), targetFldName));
+            }
+            sb.append(returnValue).append(")");
+        }
         return sb.toString();
     }
 

@@ -10,6 +10,7 @@ block
 
 stat
 : assignment
+| END
 ;
 
 assignment
@@ -23,8 +24,8 @@ expr
  | expr op=(PLUS | MINUS) expr          #additiveExpr
  | expr op=(LTEQ | GTEQ | LT | GT) expr #relationalExpr
  | expr op=(EQ | NEQ) expr              #equalityExpr
- | expr AND expr                        #andExpr
- | expr OR expr                         #orExpr
+ | expr op=(AND | SAND) expr            #andSandExpr
+ | expr op=(OR | SOR) expr              #orSorExpr
  | expr OTHERWISE expr                  #ternaryoperator
  | expr ALT expr                        #altoperator
  | element                              #elementExpr
@@ -40,6 +41,8 @@ element
  | NIL            #nilAtom
  ;
 
+SOR : '|||';
+SAND : '&&&';
 OR : '||';
 AND : '&&';
 EQ : '==';
@@ -57,6 +60,7 @@ POW : '^';
 NOT : '!';
 OTHERWISE : '?' ;
 ALT : ':' ;
+END : 'END' ;
 
 SCOL : ';';
 ASSIGN : '=';

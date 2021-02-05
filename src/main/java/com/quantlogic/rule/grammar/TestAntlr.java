@@ -19,7 +19,7 @@ public class TestAntlr extends QuantlogicBaseVisitor<String> {
 
     @Override
     public String visitStat(QuantlogicParser.StatContext ctx) {
-        System.out.println("3");
+        System.out.println("STAT");
         return super.visitStat(ctx);
     }
 
@@ -46,12 +46,12 @@ public class TestAntlr extends QuantlogicBaseVisitor<String> {
         System.out.println("4");
         return super.visitFunctionAtom(ctx);
     }
-
+/*
     @Override
     public String visitOrExpr(QuantlogicParser.OrExprContext ctx) {
-        System.out.println("5");
+        System.out.println(" OR ");
         return super.visitOrExpr(ctx);
-    }
+    }*/
 
     @Override
     public String visitNilAtom(QuantlogicParser.NilAtomContext ctx) {
@@ -132,8 +132,34 @@ public class TestAntlr extends QuantlogicBaseVisitor<String> {
     }
 
     @Override
+    public String visitOrSorExpr(QuantlogicParser.OrSorExprContext ctx) {
+        System.out.println("OP = "+ctx.getChild(1));
+        return super.visitOrSorExpr(ctx);
+    }
+
+    @Override
+    public String visitAndSandExpr(QuantlogicParser.AndSandExprContext ctx) {
+        System.out.println("OP = "+ctx.getChild(1));
+        return super.visitAndSandExpr(ctx);
+    }
+
+    /* @Override
     public String visitAndExpr(QuantlogicParser.AndExprContext ctx) {
-        System.out.println("18");
+        System.out.println("AND");
         return super.visitAndExpr(ctx);
     }
+*/
+
+
+    /*@Override
+    public String visitSandExpr(QuantlogicParser.SandExprContext ctx) {
+        System.out.println("got SAND");
+        return super.visitSandExpr(ctx);
+    }
+
+    @Override
+    public String visitSorExpr(QuantlogicParser.SorExprContext ctx) {
+        System.out.println("got SOR");
+        return super.visitSorExpr(ctx);
+    }*/
 }

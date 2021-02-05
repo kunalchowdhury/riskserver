@@ -1,3 +1,4 @@
-volQQQ_1_1 = ($underlying == "QQQ" && ($tickerSymbol == "OTC123" || $qty == 100)) ? com.quantlogic.util.VolKeygenUtil.getFlatVolKey("QQQ", 20201202, .SPX) : "BlackVariance|$underlying|2021"
-volQQQ_1_2 = ($tickerSymbol == "QQQ") ? "FlatVol|$tickerSymbol|2021" : VolKeygenUtil.getFlatVolKey("QQQ", 202020102)
-volAAPL_2_1 = ($tickerSymbol == "AAPL") ? "FlatVol|AAPL|2021" : "BlackVariance|$underlying|2021"
+volQQQ_1_1 = ($underlying == "QQQ" && ($tickerSymbol == "OTC123" || $volatility == 0.36)) ? com.quantlogic.util.VolKeygenUtil.getFlatVolKey("QQQ", 20201202, .SPX)
+volSPX_1_2 = ($tickerSymbol == "QQQ") ? com.quantlogic.util.VolKeygenUtil.getFlatVolKey("QQQ", 20201202, .SPX)
+volAAPL_2_1 = ($tickerSymbol == "AAPL") ? com.quantlogic.util.VolKeygenUtil.getFlatVolKey("QQQ", 20201202, .SPX)
+END

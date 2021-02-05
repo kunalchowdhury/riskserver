@@ -6,13 +6,13 @@ import com.quantlogic.enumtype.OptionType;
 
 public class VanillaOption extends Instrument{
 
-    private double strike ;
-    private double underlying ;
-    private double riskFreeRate ;
-    private double dividendYield;
-    private double volatility ;
-    private long settlementDate;
-    private long maturity;
+    private Double strike ;
+    private String underlying ;
+    private Double riskFreeRate ;
+    private Double dividendYield;
+    private Double volatility ;
+    private Long settlementDate;
+    private Long maturity;
     private DayCount dayCount;
     private OptionType optionType;
     private ExcerciseType excerciseType;
@@ -20,13 +20,13 @@ public class VanillaOption extends Instrument{
 
 
 
-    public VanillaOption(int id, String name, int version, long insertTime) {
+    public VanillaOption(int id, String name, int version, Long insertTime) {
         super(id, name, version, insertTime);
     }
 
-    public VanillaOption(int id, String name, double strike, double underlying, double riskFreeRate, double dividendYield,
-                         double volatility, long settlementDate, long maturity, DayCount dayCount, OptionType optionType,
-                         ExcerciseType excerciseType, int version, String tickerSymbol, long insertTime) {
+    public VanillaOption(int id, String name, Double strike, String underlying, Double riskFreeRate, Double dividendYield,
+                         Double volatility, Long settlementDate, Long maturity, DayCount dayCount, OptionType optionType,
+                         ExcerciseType excerciseType, int version, String tickerSymbol, Long insertTime) {
         super(id, name,  version, insertTime);
         this.strike = strike;
         this.underlying = underlying;
@@ -42,31 +42,31 @@ public class VanillaOption extends Instrument{
 
     }
 
-    public double getStrike() {
+    public Double getStrike() {
         return strike;
     }
 
-    public double getUnderlying() {
+    public String getUnderlying() {
         return underlying;
     }
 
-    public double getRiskFreeRate() {
+    public Double getRiskFreeRate() {
         return riskFreeRate;
     }
 
-    public double getDividendYield() {
+    public Double getDividendYield() {
         return dividendYield;
     }
 
-    public double getVolatility() {
+    public Double getVolatility() {
         return volatility;
     }
 
-    public long getSettlementDate() {
+    public Long getSettlementDate() {
         return settlementDate;
     }
 
-    public long getMaturity() {
+    public Long getMaturity() {
         return maturity;
     }
 

@@ -16,7 +16,6 @@ public class EntityRuleBuilder<T extends Entity, U extends Entity> implements Bu
     private final ClassPool cp;
     private CtClass cc;
 
-
     public EntityRuleBuilder(EntityRuleSet<T, U> entityRuleSet) {
         this.cp = ClassPool.getDefault();
         cp.importPackage("com.quantlogic.entity.*");
