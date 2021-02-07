@@ -4,7 +4,6 @@ package com.quantlogic.rule.grammar;
 import com.quantlogic.rules.QuantlogicLexer;
 import com.quantlogic.rules.QuantlogicParser;
 import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -19,25 +18,11 @@ public class Main {
 
         System.out.println("parsing: " + args[0]);
 
-        ANTLRInputStream antlrInputStream = new ANTLRInputStream("volQQQ_1_1 = ($underlying == \"QQQ\" && ($tickerSymbol == \"OTC123\" || $volatility == 0.36)) ? com.quantlogic.util.VolKeygenUtil.getFlatVolKey(\"QQQ\", 20201202, .SPX)");
         QuantlogicLexer lexer = new QuantlogicLexer(new ANTLRFileStream(args[0]));
         QuantlogicParser parser = new QuantlogicParser(new CommonTokenStream(lexer));
         ParseTree tree = parser.parse();
         TestAntlr visitor = new TestAntlr();
         visitor.visit(tree);
     }
-   /* public static void main1(String[] args) throws Exception {
 
-        if (args.length == 0) {
-            args = new String[]{"src/main/mu/test.mu"};
-        }
-
-        System.out.println("parsing: " + args[0]);
-
-        MuLexer lexer = new MuLexer(new ANTLRFileStream(args[0]));
-        MuParser parser = new MuParser(new CommonTokenStream(lexer));
-        ParseTree tree = parser.parse();
-        EvalVisitor visitor = new EvalVisitor();
-        visitor.visit(tree);
-    }*/
 }

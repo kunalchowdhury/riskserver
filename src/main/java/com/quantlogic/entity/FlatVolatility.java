@@ -1,9 +1,11 @@
 package com.quantlogic.entity;
 
+import com.quantlogic.annotation.BaseEntity;
 import org.quantlib.Calendar;
 import org.quantlib.Date;
 import org.quantlib.DayCounter;
 
+@BaseEntity
 public class FlatVolatility extends Volatility{
     private Date settlementDate;
     private Calendar calendar;

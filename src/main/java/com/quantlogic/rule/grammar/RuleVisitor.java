@@ -54,7 +54,6 @@ public class RuleVisitor<T extends Entity, U extends Entity> extends QuantlogicB
             }
         }
         entityRuleBuilder = new EntityRuleBuilder<>(this.entityRuleSet);
-        StringBuilder sb = new StringBuilder();
         return super.visitStat(ctx);
     }
 

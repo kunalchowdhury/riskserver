@@ -1,9 +1,11 @@
 package com.quantlogic.entity;
 
+import com.quantlogic.annotation.BaseEntity;
 import com.quantlogic.enumtype.DayCount;
 import com.quantlogic.enumtype.ExcerciseType;
 import com.quantlogic.enumtype.OptionType;
 
+@BaseEntity
 public class VanillaOption extends Instrument{
 
     private Double strike ;
@@ -24,9 +26,11 @@ public class VanillaOption extends Instrument{
         super(id, name, version, insertTime);
     }
 
-    public VanillaOption(int id, String name, Double strike, String underlying, Double riskFreeRate, Double dividendYield,
-                         Double volatility, Long settlementDate, Long maturity, DayCount dayCount, OptionType optionType,
-                         ExcerciseType excerciseType, int version, String tickerSymbol, Long insertTime) {
+    public VanillaOption(int id, String name, Double strike, String underlying,
+                         Double riskFreeRate, Double dividendYield, Double volatility,
+                         Long settlementDate, Long maturity, DayCount dayCount,
+                         OptionType optionType, ExcerciseType excerciseType, int version,
+                         String tickerSymbol, Long insertTime) {
         super(id, name,  version, insertTime);
         this.strike = strike;
         this.underlying = underlying;

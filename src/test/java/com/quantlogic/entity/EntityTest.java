@@ -1,12 +1,76 @@
 package com.quantlogic.entity;
 
+import com.quantlogic.entity.metadata.BlackVarianceVolSurfaceDelta;
+import com.quantlogic.enumtype.DayCount;
+import com.quantlogic.enumtype.USMarketType;
+import com.quantlogic.util.ReflectionUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.quantlib.VanillaOption;
 import org.quantlib.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
 public class EntityTest {
+
+    @Test
+    public void testDeltaEntity(){
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        zeroAll(calendar);
+        calendar.set(15, java.util.Calendar.MAY, 15);
+        long valuationDate = calendar.getTime().getTime();
+
+        Long[] expirations = new Long[5];
+        set(calendar, 2013, java.util.Calendar.DECEMBER, 20, expirations, 0);
+        set(calendar, 2014, java.util.Calendar.JANUARY, 17, expirations, 1);
+        set(calendar, 2014, java.util.Calendar.MARCH, 21, expirations, 2);
+        set(calendar, 2014, java.util.Calendar.JUNE, 20, expirations, 3);
+        set(calendar, 2014, java.util.Calendar.SEPTEMBER, 19, expirations, 4);
+
+        Double[][] vols = new Double[][]{
+                {0.15640, 0.15433, 0.16079 , 0.16394, 0.17383},
+                {0.15343, 0.15240, 0.15804 , 0.16255, 0.17303},
+                {0.15128, 0.14888, 0.15512 , 0.15944, 0.17038},
+                {0.14798, 0.14906, 0.15522 , 0.16171, 0.16156},
+                {0.14580, 0.14576, 0.15364 , 0.16037, 0.16042}
+        };
+        BlackVarianceVolatilitySurface vol = new BlackVarianceVolatilitySurface(100,
+                "QQQ_Black_Variance", 1,
+                valuationDate,
+                valuationDate,
+                USMarketType.NYSE,
+                expirations,
+                new Double[]{1650.0, 1660.0, 1670.0, 1675.0, 1680.0},
+                DayCount.ACTUAL_365_FIXED,
+                vols);
+
+        BlackVarianceVolSurfaceDelta delta = new BlackVarianceVolSurfaceDelta("strikes",
+                "1660.3", new int[]{2}, null,false);
+
+        Assert.assertEquals(1670.0, vol.getStrikes()[2], 0);
+        try {
+            BlackVarianceVolatilitySurface modifiedEntity = ReflectionUtils.INSTANCE.getModifiedEntity(vol, delta);
+            Assert.assertEquals(1660.4, vol.getStrikes()[2], 0);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void set(java.util.Calendar calendar, int year, int month, int day, Long[] expirations, int idx){
+        zeroAll(calendar);
+        calendar.set(year, month, day);
+        expirations[idx] = calendar.getTime().getTime();
+    }
+
+    private void zeroAll(java.util.Calendar calendar) {
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+    }
+
     public static void main(String[] args) {
         Matrix volMatrix = new Matrix(5 ,5);
         volMatrix.set(0,0 , 0.15640);

@@ -8,7 +8,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 
 public final class DateUtil {
-    private static Calendar calendar = Calendar.getInstance();
+    private static final Calendar calendar = Calendar.getInstance();
 
     public static Date fromEpochMillis(long epoch){
         zeroAll();

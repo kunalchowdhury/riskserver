@@ -37,14 +37,6 @@ public class RuleTest {
         Assert.assertEquals("vanillaOpton.getTickerSymbol().equals(String.valueOf(\"OTC123\"))", s1);
      }
 
-    /*@Test
-    public void testGenerateEqualsStmt() {
-        String s = "$tickerSymbol == \"OTC123\"";
-        ReflectionUtils utils =  ReflectionUtils.INSTANCE;
-        String s1 = utils.generateEqualsStatement(VanillaOption.class, "vanillaOpton", s.replaceAll("\"", ""), true);
-        Assert.assertEquals("vanillaOpton.getTickerSymbol().equals(String.valueOf(\"OTC123\"))", s1);
-    }*/
-
      @Test
      public void testAutogenRules() throws Exception{
          String s = "(getSource().getVolatility().equals(Double.valueOf(\"0.36\")) || getSource().getTickerSymbol().equals(String.valueOf(\"OTC123\")) )  && getSource().getUnderlying().equals(String.valueOf(\"QQQ\")) ";
@@ -56,7 +48,7 @@ public class RuleTest {
                  .withRuleWeight("2")
                  .withSourceAndTarget(Pair.of("com.quantlogic.entity.VanillaOption", "instrument"),
                  Pair.of("com.quantlogic.entity.BlackVarianceVolatilitySurface", "volatility")).withPredicate(s, s1).build();
-
+         
          entityRuleBuilder.writeFile();
          Assert.assertNotNull(er);
      }
@@ -83,7 +75,6 @@ public class RuleTest {
 
          EntityRuleBuilder<VanillaOption, BlackVarianceVolatilitySurface> entityRuleBuilder = new EntityRuleBuilder<>(entityRuleSet);
          RuleVisitor<VanillaOption, BlackVarianceVolatilitySurface> ruleVisitor = new RuleVisitor<>(entityRuleSet, VanillaOption.class, BlackVarianceVolatilitySurface.class);
-
 
         // ANTLRInputStream antlrInputStream = new ANTLRInputStream("volQQQ_1_1 = ($underlying == \"QQQ\" && ($tickerSymbol == \"OTC123\" || $volatility == 0.36)) ? com.quantlogic.util.VolKeygenUtil.getFlatVolKey(\"QQQ\", 20201202, .SPX)");
          com.quantlogic.rules.QuantlogicLexer lexer = new com.quantlogic.rules.QuantlogicLexer(new ANTLRFileStream("src/main/resources/rules/rulestore.quantlogic"));
