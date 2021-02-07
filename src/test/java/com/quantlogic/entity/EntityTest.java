@@ -52,7 +52,7 @@ public class EntityTest {
         Assert.assertEquals(1670.0, vol.getStrikes()[2], 0);
         try {
             BlackVarianceVolatilitySurface modifiedEntity = ReflectionUtils.INSTANCE.getModifiedEntity(vol, delta);
-            Assert.assertEquals(1660.4, vol.getStrikes()[2], 0);
+            Assert.assertEquals(1660.3, vol.getStrikes()[2], 0);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
