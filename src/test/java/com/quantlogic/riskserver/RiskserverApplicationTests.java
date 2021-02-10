@@ -160,7 +160,7 @@ class RiskserverApplicationTests {
 
     @AfterEach
     public void destroy() {
-       this.ruleRepository.deleteRule("RULESET1");
+        this.ruleRepository.deleteRule("RULESET1");
     }
 
 
