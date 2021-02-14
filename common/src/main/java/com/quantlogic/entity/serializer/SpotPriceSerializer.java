@@ -1,4 +1,4 @@
-package com.quantlogic.dto.serializers;
+package com.quantlogic.entity.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
@@ -10,21 +10,20 @@ public class SpotPriceSerializer extends Serializer<SpotPrice> {
 
     @Override
     public void write(Kryo kryo, Output output, SpotPrice spotPrice) {
-        output.writeString(spotPrice.getTicker());
+        output.writeString(spotPrice.getTicker().trim());
         output.writeDouble(spotPrice.getMid());
         output.writeDouble(spotPrice.getHi());
         output.writeDouble(spotPrice.getLo());
         output.writeDouble(spotPrice.getOpen());
         output.writeDouble(spotPrice.getClose());
-        output.writeLong(spotPrice.getSnapshot());
-        output.writeString(spotPrice.getName());
-        output.writeLong(spotPrice.getVersion());
+        output.writeString(spotPrice.getName().trim());
+        output.write(spotPrice.getVersion());
     }
 
     @Override
     public SpotPrice read(Kryo kryo, Input input, Class<? extends SpotPrice> aClass) {
-        return new SpotPrice(input.readString(), input.readDouble(), input.readDouble(),
-                input.readDouble(), input.readDouble(), input.readDouble(), input.readLong(), input.readString(),
-                input.readLong());
+        return new SpotPrice(input.readString().trim(), input.readDouble(), input.readDouble(),
+                input.readDouble(), input.readDouble(), input.readDouble(), input.readString().trim(),
+                input.read());
     }
 }

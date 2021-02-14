@@ -4,11 +4,11 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.quantlogic.common.entity.TimedBlackVarianceVolatility;
+import com.quantlogic.dto.BlackVarianceVolatilityDTO;
 
-public class BlackVarianceVolSerializer  extends Serializer<TimedBlackVarianceVolatility> {
+public class BlackVarianceVolDTOSerializer extends Serializer<BlackVarianceVolatilityDTO> {
     @Override
-    public void write(Kryo kryo, Output output, TimedBlackVarianceVolatility blackVarianceVolatility) {
+    public void write(Kryo kryo, Output output, BlackVarianceVolatilityDTO blackVarianceVolatility) {
         output.writeLong(blackVarianceVolatility.getValuationDate());
         output.writeByte(blackVarianceVolatility.getCalendar());
         long[] expirations = blackVarianceVolatility.getExpirations();
@@ -23,13 +23,13 @@ public class BlackVarianceVolSerializer  extends Serializer<TimedBlackVarianceVo
         for (double[] vol : vols) {
             output.writeDoubles(vol, 0, vols[0].length);
         }
-        output.writeLong(blackVarianceVolatility.getVersion());
+        output.write(blackVarianceVolatility.getVersion());
         output.write(blackVarianceVolatility.getShardId());
-        output.writeString(blackVarianceVolatility.getName());
+        output.writeString(blackVarianceVolatility.getName().trim());
     }
 
     @Override
-    public TimedBlackVarianceVolatility read(Kryo kryo, Input input, Class<? extends TimedBlackVarianceVolatility> aClass) {
+    public BlackVarianceVolatilityDTO read(Kryo kryo, Input input, Class<? extends BlackVarianceVolatilityDTO> aClass) {
         long valuationDate = input.readLong();
         byte calendar = input.readByte();
         int expirationsLen = input.read();
@@ -42,10 +42,10 @@ public class BlackVarianceVolSerializer  extends Serializer<TimedBlackVarianceVo
         for (int i = 0; i < volsLen; i++) {
             vols[i] = input.readDoubles(volsLen);
         }
-        long version = input.readLong();
+        int version = input.read();
         int shardId = input.read();
-        String name = input.readString();
-        return new TimedBlackVarianceVolatility(valuationDate, calendar,
+        String name = input.readString().trim();
+        return new BlackVarianceVolatilityDTO(valuationDate, calendar,
                 expiration, strikes, curDayCounter , vols, version, shardId, name);
     }
 }

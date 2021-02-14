@@ -9,14 +9,16 @@ public class SpotPriceDTO implements DTOEntity{
     private double lo;
     private double open;
     private double close;
+    private int version;
 
-    public SpotPriceDTO(String ticker, double mid, double hi, double lo, double open, double close) {
+    public SpotPriceDTO(String ticker, double mid, double hi, double lo, double open, double close, int version) {
         this.ticker = ticker;
         this.mid = mid;
         this.hi = hi;
         this.lo = lo;
         this.open = open;
         this.close = close;
+        this.version = version;
     }
 
     public String getTicker() {
@@ -67,6 +69,14 @@ public class SpotPriceDTO implements DTOEntity{
         this.close = close;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     @Override
     public String getName() {
         return this.ticker;
@@ -77,14 +87,14 @@ public class SpotPriceDTO implements DTOEntity{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SpotPriceDTO that = (SpotPriceDTO) o;
-        return Double.compare(that.mid, mid) == 0 && Double.compare(that.hi, hi) == 0
-                && Double.compare(that.lo, lo) == 0 && Double.compare(that.open, open) == 0
-                && Double.compare(that.close, close) == 0 && Objects.equals(ticker, that.ticker);
+        return Double.compare(that.mid, mid) == 0 && Double.compare(that.hi, hi) == 0 && Double.compare(that.lo, lo) == 0
+                && Double.compare(that.open, open) == 0 && Double.compare(that.close, close) == 0
+                && version == that.version && ticker.equals(that.ticker);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ticker, mid, hi, lo, open, close);
+        return Objects.hash(ticker, mid, hi, lo, open, close, version);
     }
 
     @Override
@@ -96,6 +106,7 @@ public class SpotPriceDTO implements DTOEntity{
                 ", lo=" + lo +
                 ", open=" + open +
                 ", close=" + close +
+                ", version=" + version +
                 '}';
     }
 }

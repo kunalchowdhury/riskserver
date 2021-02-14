@@ -1,5 +1,7 @@
 package com.quantlogic.common.entity;
 
+import com.quantlogic.dto.VanillaOptionDTO;
+
 import java.util.Objects;
 
 public class TimedVanillaOption implements NamedTimedEntity {
@@ -14,14 +16,23 @@ public class TimedVanillaOption implements NamedTimedEntity {
     private byte optionType;
     private byte excerciseType;
     private String tickerSymbol;
-    private long version;
+    private int version;
     private int shardId;
     private long snapshotTime;
     private String name;
 
+    public TimedVanillaOption(VanillaOptionDTO vanillaOptionDTO) {
+        this(vanillaOptionDTO.getStrike(), vanillaOptionDTO.getUnderlying(), vanillaOptionDTO.getRiskFreeRate(),
+                vanillaOptionDTO.getDividendYield(), vanillaOptionDTO.getVolatility(),
+                vanillaOptionDTO.getSettlementDate(), vanillaOptionDTO.getMaturity(),
+                vanillaOptionDTO.getDayCount(), vanillaOptionDTO.getOptionType(),
+                vanillaOptionDTO.getExcerciseType(), vanillaOptionDTO.getTickerSymbol(),
+                vanillaOptionDTO.getVersion(), vanillaOptionDTO.getShardId(), vanillaOptionDTO.getName());
+    }
+
     public TimedVanillaOption(double strike, String underlying, double riskFreeRate, double dividendYield,
                               double volatility, long settlementDate, long maturity, byte dayCount, byte optionType,
-                              byte excerciseType, String tickerSymbol, long version, int shardId, String name) {
+                              byte excerciseType, String tickerSymbol, int version, int shardId, String name) {
         this.strike = strike;
         this.underlying = underlying;
         this.riskFreeRate = riskFreeRate;
@@ -130,11 +141,11 @@ public class TimedVanillaOption implements NamedTimedEntity {
         this.tickerSymbol = tickerSymbol;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

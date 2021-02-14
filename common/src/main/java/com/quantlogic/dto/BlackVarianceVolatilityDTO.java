@@ -10,7 +10,7 @@ public class BlackVarianceVolatilityDTO implements DTOEntity {
     private double[] strikes;
     private byte curDayCounter;
     private double[][] vols;
-    private long version;
+    private int version;
     private int shardId;
     private String name;
 
@@ -23,7 +23,7 @@ public class BlackVarianceVolatilityDTO implements DTOEntity {
                                       double[] strikes,
                                       byte curDayCounter,
                                       double[][] vols,
-                                      long version,
+                                      int version,
                                       int shardId,
                                       String name) {
         this.valuationDate = valuationDate;
@@ -85,11 +85,11 @@ public class BlackVarianceVolatilityDTO implements DTOEntity {
         this.vols = vols;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

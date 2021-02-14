@@ -1,10 +1,95 @@
+import org.assertj.core.util.Lists;
 import org.quantlib.*;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
 public class Test {
 
     public static void main(String[] args) {
+        Observable.just("ERA")
+                .doOnSubscribe(
+                        new Action0() {
+                            @Override
+                            public void call() {
+                                System.out.println(Thread.currentThread().getName() + " HELLO");
+                            }
+                        }
+                ).subscribeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        System.out.println(Thread.currentThread().getName() + " ~~~~~~~  123" );
+                    }
+                }).subscribeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        System.out.println(Thread.currentThread().getName() + " ~~~~~~~  234" );
+                    }
+                }).subscribeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        System.out.println(Thread.currentThread().getName() + " ~~~~~~~  456" );
+                    }
+                }).subscribe(new Subscriber<String>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+
+            }
+
+            @Override
+            public void onNext(String s) {
+                System.out.println(s);
+            }
+        });
+    }
+
+    public static void main2(String[] args) {
+//https://stackoverflow.com/questions/44984730/rxandroid-whats-the-difference-between-subscribeon-and-observeon/44985270#44985270
+        Observable.from(Lists.newArrayList("ABC"))
+                .observeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        System.out.println(Thread.currentThread().getName() + " " + s);
+                    }
+                }).observeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+                .map(new Func1<String, String>() {
+                    @Override
+                    public String call(String s) {
+                        return "---  " + s;
+                    }
+                })
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        System.out.println(Thread.currentThread().getName() + " -- >>  " + s);
+                    }
+                }).observeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        System.out.println(Thread.currentThread().getName() + " :::  " + s);
+                    }
+                }).subscribe();
+
+
+    }
+
+    public static void main1(String[] args) {
         Calendar cal = new TARGET();
         Date settlementDate = new Date(18, Month.September, 2008);
         // must be a business day
@@ -50,7 +135,7 @@ public class Test {
         double redemption = 100.0;
         final int numberOfBonds = 5;
 
-        Date issueDates[] = {
+        Date[] issueDates = {
                 new Date(15, Month.March, 2005),
                 new Date(15, Month.June, 2005),
                 new Date(30, Month.June, 2006),
@@ -58,7 +143,7 @@ public class Test {
                 new Date(15, Month.May, 1987),
         };
 
-        Date maturities[] = {
+        Date[] maturities = {
                 new Date(31, Month.August, 2010),
                 new Date(31, Month.August, 2011),
                 new Date(31, Month.August, 2013),
@@ -66,7 +151,7 @@ public class Test {
                 new Date(15, Month.May, 2038),
         };
 
-        double couponRates[] = {
+        double[] couponRates = {
                 0.02375,
                 0.04625,
                 0.03125,
@@ -74,7 +159,7 @@ public class Test {
                 0.04500
         };
 
-        SimpleQuote marketQuotes[] = {
+        SimpleQuote[] marketQuotes = {
                 new SimpleQuote(100.390625),
                 new SimpleQuote(106.21875),
                 new SimpleQuote(100.59375),
@@ -83,13 +168,13 @@ public class Test {
         };
 
         QuoteHandleVector quoteHandle = new QuoteHandleVector();
-        for (int i=0; i<numberOfBonds; i++){
+        for (int i = 0; i < numberOfBonds; i++) {
             quoteHandle.add(new QuoteHandle(marketQuotes[i]));
         }
 
         ArrayList<FixedRateBondHelper> bondHelpers =
                 new ArrayList<FixedRateBondHelper>();
-        for (int i=0; i<numberOfBonds;i++){
+        for (int i = 0; i < numberOfBonds; i++) {
             Schedule schedule =
                     new Schedule(issueDates[i],
                             maturities[i],
@@ -134,12 +219,12 @@ public class Test {
         bondInstruments.add(zc1y);
 
         // Adding the Fixed rate bonds to the curve for the long end
-        for (int i=0; i<numberOfBonds;i++){
+        for (int i = 0; i < numberOfBonds; i++) {
             bondInstruments.add(bondHelpers.get(i));
         }
 
         YieldTermStructure bondDiscountingTermStructure =
-                new PiecewiseFlatForward(settlementDate,bondInstruments,
+                new PiecewiseFlatForward(settlementDate, bondInstruments,
                         termStructureDayCounter);
 
         // Building of the Libor forecasting curve
@@ -223,7 +308,7 @@ public class Test {
                 new Thirty360(Thirty360.Convention.European);
         IborIndex swFloatingLegIndex = new Euribor6M();
 
-        Period forwardStart  = new Period(1, TimeUnit.Days);
+        Period forwardStart = new Period(1, TimeUnit.Days);
         QuoteHandle spread = new QuoteHandle();
         RateHelper s2y =
                 new SwapRateHelper(s2yQuoteHandle,
@@ -433,13 +518,13 @@ public class Test {
                 fixedRateBond.dirtyPrice(),
                 floatingRateBond.dirtyPrice());
         System.out.printf("%18s%8.2f %%%8.2f %%%8.2f %%\n", "Yield",
-                100*zeroCouponBond.yield(new Actual360(),
+                100 * zeroCouponBond.yield(new Actual360(),
                         Compounding.Compounded,
                         Frequency.Annual),
-                100*fixedRateBond.yield(new Actual360(),
+                100 * fixedRateBond.yield(new Actual360(),
                         Compounding.Compounded,
                         Frequency.Annual),
-                100*floatingRateBond.yield(new Actual360(),
+                100 * floatingRateBond.yield(new Actual360(),
                         Compounding.Compounded,
                         Frequency.Annual));
 
@@ -453,7 +538,7 @@ public class Test {
                         Frequency.Annual, settlementDate));
 
         System.out.printf("Clean Price to Yield: %.2f %%\n",
-                100*floatingRateBond.yield(
+                100 * floatingRateBond.yield(
                         floatingRateBond.cleanPrice(),
                         new Actual360(), Compounding.Compounded,
                         Frequency.Annual, settlementDate));

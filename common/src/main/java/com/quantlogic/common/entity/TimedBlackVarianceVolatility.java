@@ -1,5 +1,7 @@
 package com.quantlogic.common.entity;
 
+import com.quantlogic.dto.BlackVarianceVolatilityDTO;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -10,15 +12,22 @@ public class TimedBlackVarianceVolatility implements NamedTimedEntity {
     private double[] strikes;
     private byte curDayCounter;
     private double[][] vols;
-    private long version;
+    private int version;
     private int shardId;
     private long snapshotTime;
     private String name;
 
+    public TimedBlackVarianceVolatility(BlackVarianceVolatilityDTO blackVarianceVolatilityDTO){
+        this(blackVarianceVolatilityDTO.getValuationDate(), blackVarianceVolatilityDTO.getCalendar(),
+                blackVarianceVolatilityDTO.getExpirations(), blackVarianceVolatilityDTO.getStrikes(),
+                blackVarianceVolatilityDTO.getCurDayCounter(), blackVarianceVolatilityDTO.getVols(),
+                blackVarianceVolatilityDTO.getVersion(), blackVarianceVolatilityDTO.getShardId(),
+                blackVarianceVolatilityDTO.getName());
+    }
 
     public TimedBlackVarianceVolatility(long valuationDate, byte calendar, long[] expirations,
                                         double[] strikes, byte curDayCounter, double[][] vols,
-                                        long version, int shardId, String name) {
+                                        int version, int shardId, String name) {
         this.valuationDate = valuationDate;
         this.calendar = calendar;
         this.expirations = expirations;
@@ -78,11 +87,11 @@ public class TimedBlackVarianceVolatility implements NamedTimedEntity {
         this.vols = vols;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

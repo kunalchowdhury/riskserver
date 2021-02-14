@@ -4,7 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.quantlogic.common.entity.TimedVanillaOption;
-import com.quantlogic.dto.serializers.VanillaOptionSerializer;
+import com.quantlogic.entity.serializer.VanillaOptionSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 

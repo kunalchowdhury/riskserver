@@ -4,7 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.quantlogic.common.entity.SpotPrice;
-import com.quantlogic.dto.serializers.SpotPriceSerializer;
+import com.quantlogic.entity.serializer.SpotPriceSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 

@@ -1,5 +1,6 @@
 package com.quantlogic.marketdata.messaging;
 
+import com.quantlogic.common.message.MarkerAndAddressResevationMessage;
 import com.quantlogic.dto.BlackVarianceVolatilityDTO;
 import com.quantlogic.dto.SpotPriceDTO;
 import com.quantlogic.dto.VanillaOptionDTO;
@@ -48,9 +49,21 @@ public class KafkaProducerConfig {
         Map<String, Object> configProps = getStringObjectMap();
         return new DefaultKafkaProducerFactory<>(configProps);
     }
+
+    @Bean
+    public ProducerFactory<String, MarkerAndAddressResevationMessage> markerMessageProducerFactory() {
+        Map<String, Object> configProps = getStringObjectMap();
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
     @Bean
     public KafkaTemplate<String, VanillaOptionDTO> vanillaOptionKafkaTemplate() {
         return new KafkaTemplate<>(vanillaOptionsProducerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, MarkerAndAddressResevationMessage> markerMessageKafkaTemplate() {
+        return new KafkaTemplate<>(markerMessageProducerFactory());
     }
 
     private Map<String, Object> getStringObjectMap() {

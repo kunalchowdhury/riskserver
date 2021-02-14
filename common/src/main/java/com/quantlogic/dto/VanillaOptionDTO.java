@@ -14,7 +14,7 @@ public class VanillaOptionDTO implements DTOEntity {
     private byte optionType;
     private byte excerciseType;
     private String tickerSymbol;
-    private long version;
+    private int version;
     private int shardId;
     private String name;
 
@@ -29,6 +29,8 @@ public class VanillaOptionDTO implements DTOEntity {
                             byte optionType,
                             byte excerciseType,
                             String tickerSymbol,
+                            int shardId,
+                            int version,
                             String name) {
         this.strike = strike;
         this.underlying = underlying;
@@ -42,6 +44,8 @@ public class VanillaOptionDTO implements DTOEntity {
         this.excerciseType = excerciseType;
         this.tickerSymbol = tickerSymbol;
         this.name = name;
+        this.version = version;
+        this.shardId = shardId;
     }
 
     public double getStrike() {
@@ -132,11 +136,11 @@ public class VanillaOptionDTO implements DTOEntity {
         this.tickerSymbol = tickerSymbol;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
@@ -181,8 +185,8 @@ public class VanillaOptionDTO implements DTOEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VanillaOptionDTO that = (VanillaOptionDTO) o;
-        return Double.compare(that.strike, strike) == 0 && Double.compare(that.riskFreeRate, riskFreeRate) == 0 &&
-                Double.compare(that.dividendYield, dividendYield) == 0 && Double.compare(that.volatility, volatility) == 0
+        return Double.compare(that.strike, strike) == 0 && Double.compare(that.riskFreeRate, riskFreeRate) == 0
+                && Double.compare(that.dividendYield, dividendYield) == 0 && Double.compare(that.volatility, volatility) == 0
                 && settlementDate == that.settlementDate && maturity == that.maturity && dayCount == that.dayCount
                 && optionType == that.optionType && excerciseType == that.excerciseType && version == that.version
                 && shardId == that.shardId && underlying.equals(that.underlying)

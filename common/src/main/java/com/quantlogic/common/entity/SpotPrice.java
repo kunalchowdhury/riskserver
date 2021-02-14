@@ -1,5 +1,7 @@
 package com.quantlogic.common.entity;
 
+import com.quantlogic.dto.SpotPriceDTO;
+
 import java.util.Objects;
 
 public class SpotPrice implements NamedTimedEntity {
@@ -9,19 +11,22 @@ public class SpotPrice implements NamedTimedEntity {
     private double lo;
     private double open;
     private double close;
-    private long snapshot;
+    private long snapshotTime;
     private String name;
-    private long version;
+    private int version;
 
+    public SpotPrice(SpotPriceDTO spotPriceDTO) {
+        this(spotPriceDTO.getTicker(), spotPriceDTO.getMid(), spotPriceDTO.getHi(), spotPriceDTO.getLo(),
+                spotPriceDTO.getOpen(), spotPriceDTO.getClose(), spotPriceDTO.getName(), spotPriceDTO.getVersion());
+    }
 
-    public SpotPrice(String ticker, double mid, double hi, double lo, double open, double close, long snapshot, String name, long version) {
+    public SpotPrice(String ticker, double mid, double hi, double lo, double open, double close, String name, int version) {
         this.ticker = ticker;
         this.mid = mid;
         this.hi = hi;
         this.lo = lo;
         this.open = open;
         this.close = close;
-        this.snapshot = snapshot;
         this.name = name;
         this.version = version;
     }
@@ -74,12 +79,8 @@ public class SpotPrice implements NamedTimedEntity {
         this.close = close;
     }
 
-    public long getSnapshot() {
-        return snapshot;
-    }
-
-    public void setSnapshot(long snapshot) {
-        this.snapshot = snapshot;
+    public void setSnapshotTime(long snapshotTime) {
+        this.snapshotTime = snapshotTime;
     }
 
     public void setName(String name) {
@@ -88,7 +89,7 @@ public class SpotPrice implements NamedTimedEntity {
 
     @Override
     public long getSnapshotTime() {
-        return this.snapshot;
+        return this.snapshotTime;
     }
 
     @Override
@@ -96,11 +97,11 @@ public class SpotPrice implements NamedTimedEntity {
         return this.name;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
@@ -111,12 +112,12 @@ public class SpotPrice implements NamedTimedEntity {
         SpotPrice spotPrice = (SpotPrice) o;
         return Double.compare(spotPrice.mid, mid) == 0 && Double.compare(spotPrice.hi, hi) == 0
                 && Double.compare(spotPrice.lo, lo) == 0 && Double.compare(spotPrice.open, open) == 0
-                && Double.compare(spotPrice.close, close) == 0 && snapshot == spotPrice.snapshot
+                && Double.compare(spotPrice.close, close) == 0 && snapshotTime == spotPrice.snapshotTime
                 && version == spotPrice.version && ticker.equals(spotPrice.ticker) && name.equals(spotPrice.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ticker, mid, hi, lo, open, close, snapshot, name, version);
+        return Objects.hash(ticker, mid, hi, lo, open, close, snapshotTime, name, version);
     }
 }
