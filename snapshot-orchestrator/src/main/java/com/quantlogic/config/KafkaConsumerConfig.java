@@ -1,7 +1,7 @@
 package com.quantlogic.config;
 
 import com.quantlogic.common.entity.EngineRegistrationMessage;
-import com.quantlogic.common.message.MarkerAndAddressResevationMessage;
+import com.quantlogic.common.message.MarkerAndAddressReservationMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,16 +23,16 @@ public class KafkaConsumerConfig {
     @Value(value = "${kafka.bootstrapAddress}")
     private String bootstrapAddress;
 
-    public ConsumerFactory<String, MarkerAndAddressResevationMessage> markerMessageKafkaConsumerFactory() {
+    public ConsumerFactory<String, MarkerAndAddressReservationMessage> markerMessageKafkaConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "markerMessage");
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(MarkerAndAddressResevationMessage.class));
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(MarkerAndAddressReservationMessage.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, MarkerAndAddressResevationMessage> markerMessageKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, MarkerAndAddressResevationMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, MarkerAndAddressReservationMessage> markerMessageKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, MarkerAndAddressReservationMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(markerMessageKafkaConsumerFactory());
         return factory;
     }

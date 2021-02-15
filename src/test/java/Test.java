@@ -9,10 +9,11 @@ import rx.schedulers.Schedulers;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Test {
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         Observable.just("ERA")
                 .doOnSubscribe(
                         new Action0() {
@@ -57,14 +58,27 @@ public class Test {
         });
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
 //https://stackoverflow.com/questions/44984730/rxandroid-whats-the-difference-between-subscribeon-and-observeon/44985270#44985270
-        Observable.from(Lists.newArrayList("ABC"))
-                .observeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("GO ");
+            }
+        }, 1, 5, java.util.concurrent.TimeUnit.SECONDS );
+        Observable.from(Lists.newArrayList("ABC", "DEF", "FHGH", "IJK","fer","eerererer", "xasdasdasda", "kerioeroeraer"))
+                .observeOn(Schedulers.from(executor))
                 .doOnNext(new Action1<String>() {
                     @Override
                     public void call(String s) {
                         System.out.println(Thread.currentThread().getName() + " " + s);
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 }).observeOn(Schedulers.from(Executors.newSingleThreadExecutor()))
                 .map(new Func1<String, String>() {

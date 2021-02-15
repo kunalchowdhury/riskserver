@@ -1,6 +1,7 @@
 package com.quantlogic.messaging;
 
-import com.quantlogic.common.message.MarkerAndAddressResevationMessage;
+import com.quantlogic.common.message.MarkerAndAddressReservationMessage;
+import com.quantlogic.common.message.Watermark;
 import com.quantlogic.snapshot.SnapshotWindowManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import java.util.concurrent.Executors;
 @Component
 public class ParameterMessageConsumer {
 
-    private final PublishSubject<MarkerAndAddressResevationMessage> publishSubject;
+    private final PublishSubject<MarkerAndAddressReservationMessage> publishSubject;
 
     public ParameterMessageConsumer(@Autowired SnapshotWindowManager snapshotWindowManager) {
         publishSubject = PublishSubject.create();
@@ -24,9 +25,9 @@ public class ParameterMessageConsumer {
                 {
                     String tag = markerMessage.getId().split("\\|")[1];
                     if(markerMessage.isFreeAddress()){
-                         snapshotWindowManager.reserveAddress(markerMessage.getAddressLoc(), true);
-                    }else if(markerMessage.isReserveAddress()){
-                        snapshotWindowManager.reserveAddress(markerMessage.getAddressLoc(), false);
+                        snapshotWindowManager.freeAddress(markerMessage.getAddressLoc());
+                    }else if(markerMessage == Watermark.INSTANCE){
+                        snapshotWindowManager.processWatermark();
                     }else if(markerMessage.isCloseBucket()) {
                         snapshotWindowManager.closeBucket(tag);
                     }else {
@@ -38,7 +39,7 @@ public class ParameterMessageConsumer {
 
     }
 
-    public PublishSubject<MarkerAndAddressResevationMessage> getPublishSubject() {
+    public PublishSubject<MarkerAndAddressReservationMessage> getPublishSubject() {
         return publishSubject;
     }
 }

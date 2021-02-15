@@ -1,6 +1,5 @@
 package com.quantlogic.mmap;
 
-import java.util.Queue;
 import java.util.Set;
 
 public interface MemoryMapManager {
@@ -11,7 +10,6 @@ public interface MemoryMapManager {
     boolean isFree(long memoryAddress);
     Set<Long> getUsedAddresses();
     Set<Long> getAddressSet();
-    Queue<Long> getInitialAddresses();
     Long reserveMemory(String cacheId, int spotsCount, int volsCount, int yieldCurveCount);
-
+    int getValue(long address);
 }

@@ -1,14 +1,14 @@
 package com.quantlogic.common.entity;
 
-public class SnapshotProcessCompletionMessage {
-    private int startMemAddress;
+public class SnapshotAllocationMessage {
+    private long startMemAddress;
     private boolean done;
 
-    public int getStartMemAddress() {
+    public long getStartMemAddress() {
         return startMemAddress;
     }
 
-    public void setStartMemAddress(int startMemAddress) {
+    public void setStartMemAddress(long startMemAddress) {
         this.startMemAddress = startMemAddress;
     }
 

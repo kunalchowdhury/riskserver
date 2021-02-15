@@ -1,6 +1,6 @@
 package com.quantlogic.marketdata.messaging;
 
-import com.quantlogic.common.message.MarkerAndAddressResevationMessage;
+import com.quantlogic.common.message.MarkerAndAddressReservationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class MarkerMessageProducer {
 
-    private final KafkaTemplate<String, MarkerAndAddressResevationMessage> kafkaTemplate;
+    private final KafkaTemplate<String, MarkerAndAddressReservationMessage> kafkaTemplate;
 
     @Value(value = "${marker.topic}")
     private String markerTopic;
 
-    private static final ThreadLocal<MarkerAndAddressResevationMessage> markerMessageThreadLocal = ThreadLocal.withInitial(MarkerAndAddressResevationMessage::new);
+    private static final ThreadLocal<MarkerAndAddressReservationMessage> markerMessageThreadLocal = ThreadLocal.withInitial(MarkerAndAddressReservationMessage::new);
 
-    public MarkerMessageProducer(@Autowired KafkaTemplate<String, MarkerAndAddressResevationMessage> kafkaTemplate) {
+    public MarkerMessageProducer(@Autowired KafkaTemplate<String, MarkerAndAddressReservationMessage> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -24,7 +24,7 @@ public class MarkerMessageProducer {
         //id is of form Spot|*
         // of Vol|*
         String id = completeId.split("\\|")[0];
-        MarkerAndAddressResevationMessage markerMessage = markerMessageThreadLocal.get();
+        MarkerAndAddressReservationMessage markerMessage = markerMessageThreadLocal.get();
         markerMessage.setId(completeId);
         markerMessage.setVersion(version);
         markerMessage.setCloseBucket(closeBucket);

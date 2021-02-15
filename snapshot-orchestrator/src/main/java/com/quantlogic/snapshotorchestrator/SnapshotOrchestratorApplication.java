@@ -10,21 +10,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.quantlogic")
 @ConfigurationPropertiesScan("com.quantlogic")
 @EnableJpaRepositories(basePackages = "com.quantlogic")
 public class SnapshotOrchestratorApplication {
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
     private final MemoryIndexRepositoryImpl memoryIndexRepository;
 
-    public SnapshotOrchestratorApplication(@Autowired MemoryIndexRepositoryImpl memoryIndexRepository,
-                                           @Autowired RedisMessageListenerContainer listenerContainer) {
+    public SnapshotOrchestratorApplication(@Autowired MemoryIndexRepositoryImpl memoryIndexRepository) {
         this.memoryIndexRepository = memoryIndexRepository;
     }
 
@@ -34,6 +33,7 @@ public class SnapshotOrchestratorApplication {
         SnapshotOrchestratorApplication bean = context.getBean(SnapshotOrchestratorApplication.class);
         bean.memoryIndexRepository.unmapMemoryAddress("VOLKEY1");
         bean.memoryIndexRepository.mapMemoryAddress("VOLKEY1", "8188188");
+        bean.memoryIndexRepository.mapMemoryAddress("VOLKEY1", "90901001");
         System.out.println(bean.memoryIndexRepository.getMemoryAddresses("VOLKEY1"));
     }
 

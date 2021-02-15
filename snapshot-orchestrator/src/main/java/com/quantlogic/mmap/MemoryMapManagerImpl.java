@@ -1,63 +1,163 @@
 package com.quantlogic.mmap;
 
-import com.google.common.collect.Queues;
 import org.springframework.stereotype.Component;
+import sun.misc.Unsafe;
+import sun.nio.ch.DirectBuffer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Queue;
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.lang.reflect.Field;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.AccessController;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class MemoryMapManagerImpl implements MemoryMapManager{
+    private static Unsafe unsafe;
+    private static final ByteOrder byteOrder;
+    static {
+        try {
+            final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            unsafe = (Unsafe) theUnsafe.get(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
 
-    private final Set<Long> addressSet;
+        }
+    }
+    private static final boolean unaligned;
+
+    static {
+        String arch = AccessController.doPrivileged(
+                new sun.security.action.GetPropertyAction("os.arch"));
+        unaligned = arch.equals("i386") || arch.equals("x86")
+                || arch.equals("amd64") || arch.equals("x86_64");
+    }
+
+    static {
+        long a = unsafe.allocateMemory(8);
+        try {
+            unsafe.putLong(a, 0x0102030405060708L);
+            byte b = unsafe.getByte(a);
+            switch (b) {
+                case 0x01: byteOrder = ByteOrder.BIG_ENDIAN;     break;
+                case 0x08: byteOrder = ByteOrder.LITTLE_ENDIAN;  break;
+                default:
+                    assert false;
+                    byteOrder = null;
+            }
+        } finally {
+            unsafe.freeMemory(a);
+        }
+    }
+    private static final String FILE_SUFFIX = ".dat";
+    private final Map<Long, Long> rootAddresses;
+    private final Map<Long, Boolean> usedAddressMap;
 
     public MemoryMapManagerImpl() {
-        this.addressSet = new HashSet<>();
+        this.rootAddresses = new LinkedHashMap<>();
+        this.usedAddressMap = new LinkedHashMap<>();
     }
 
     @Override
     public long getStartAddress(long memoryAddress) {
-        return 0;
+        return this.rootAddresses.get(memoryAddress);
     }
 
     @Override
     public void set(long memoryAddress, int version) {
-
+        unsafe.putInt(memoryAddress, version);
     }
 
     @Override
     public void markUsed(long memoryAddress) {
-
+        usedAddressMap.put(memoryAddress, true);
     }
 
     @Override
     public void markFree(long memoryAddress) {
-
+        usedAddressMap.put(memoryAddress, false);
     }
 
     @Override
     public boolean isFree(long memoryAddress) {
-        return false;
+        return !usedAddressMap.get(memoryAddress);
     }
 
     @Override
     public Set<Long> getUsedAddresses() {
-        return Collections.emptySet();
+        return usedAddressMap.entrySet().stream().filter(e -> !e.getValue()).map(Map.Entry::getKey).collect(Collectors.toSet());
     }
 
     public Set<Long> getAddressSet() {
-        return addressSet;
-    }
-
-    @Override
-    public Queue<Long> getInitialAddresses() {
-        return Queues.newArrayDeque();
+        return this.rootAddresses.keySet();
     }
 
     @Override
     public Long reserveMemory(String cacheId, int spotsCount, int volsCount, int yieldCurveCount) {
-        return null;
+        try {
+            double sz = 4 * (spotsCount + volsCount + yieldCurveCount);
+            Path path = Paths.get(System.getProperty("user.home")+ File.separator+cacheId+"MappedCache");
+            if (!Files.exists(path)) {
+                Files.createDirectory(path);
+            }
+            final String fileName = path.toAbsolutePath().toString()+ File.separator +"version_cache_" + cacheId + FILE_SUFFIX;
+            RandomAccessFile cacheFile = new RandomAccessFile(fileName, "rw");
+            MappedByteBuffer mbf = cacheFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, (long) sz);
+            long rootAddress = ((DirectBuffer) mbf).address();
+            for (int i = 0; i < sz; i+=4) {
+                long key = rootAddress + i;
+                this.rootAddresses.put(key, rootAddress);
+                this.usedAddressMap.put(key, false);
+            }
+            return rootAddress;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        throw new RuntimeException("This should not have occured for "+cacheId);
+    }
+
+    @Override
+    public int getValue(long address) {
+        return unsafe.getInt(address);
+    }
+
+    private static int swap(int x) {
+        return Integer.reverseBytes(x);
+    }
+    static int getInt(long a) {
+        boolean nativeByteOrder = (byteOrder == ByteOrder.BIG_ENDIAN);
+        if (unaligned) {
+            int x = unsafe.getInt(a );
+            return (nativeByteOrder ? x : swap(x));
+        }
+        throw new RuntimeException("I DIDNT TAKE CARE OF THIS !");
+    }
+
+    public static void main(String[] args) {
+        MemoryMapManagerImpl m = new MemoryMapManagerImpl();
+        Long aapl = m.reserveMemory("AAPL", 2, 3, 1);
+        m.set(aapl, 1901);
+        System.out.println(m.getValue(aapl));
+        m.set(aapl + 4, 1902);
+        System.out.println(m.getValue(aapl + 4));
+
+        Long fb = m.reserveMemory("FB", 7, 3, 1);
+        m.set(fb, 1910);
+        System.out.println(m.getValue(fb));
+        m.set(fb + 4, 1920);
+        m.set(fb + 8, 1930);
+        System.out.println(m.getValue(fb + 4));
+        System.out.println(m.getValue(fb + 8));
     }
 }

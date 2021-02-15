@@ -1,9 +1,7 @@
-package com.quantlogic.marketdata.messaging;
+package com.quantlogic.config;
 
+import com.quantlogic.common.entity.SnapshotAllocationMessage;
 import com.quantlogic.common.message.MarkerAndAddressReservationMessage;
-import com.quantlogic.dto.BlackVarianceVolatilityDTO;
-import com.quantlogic.dto.SpotPriceDTO;
-import com.quantlogic.dto.VanillaOptionDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,51 +17,29 @@ import java.util.Map;
 
 @Configuration
 public class KafkaProducerConfig {
-
     @Value(value = "${kafka.bootstrapAddress}")
     private String bootstrapAddress;
 
     @Bean
-    public ProducerFactory<String, SpotPriceDTO> spotPriceProducerFactory() {
+    public ProducerFactory<String, SnapshotAllocationMessage> snapshotAllocationMessageProducerFactory() {
         Map<String, Object> configProps = getStringObjectMap();
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
     @Bean
-    public KafkaTemplate<String, SpotPriceDTO> spotPriceKafkaTemplate() {
-        return new KafkaTemplate<>(spotPriceProducerFactory());
+    public KafkaTemplate<String, SnapshotAllocationMessage> snapshotAllocationMessageKafkaTemplate() {
+        return new KafkaTemplate<>(snapshotAllocationMessageProducerFactory());
     }
 
     @Bean
-    public ProducerFactory<String, BlackVarianceVolatilityDTO> blackVolVarianceProducerFactory() {
-        Map<String, Object> configProps = getStringObjectMap();
-        return new DefaultKafkaProducerFactory<>(configProps);
-    }
-    @Bean
-    public KafkaTemplate<String, BlackVarianceVolatilityDTO> blackVolVarianceKafkaTemplate() {
-        return new KafkaTemplate<>(blackVolVarianceProducerFactory());
-    }
-
-    @Bean
-    public ProducerFactory<String, VanillaOptionDTO> vanillaOptionsProducerFactory() {
+    public ProducerFactory<String, MarkerAndAddressReservationMessage> markerAndAddressReservationMessageProducerFactory() {
         Map<String, Object> configProps = getStringObjectMap();
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
     @Bean
-    public ProducerFactory<String, MarkerAndAddressReservationMessage> markerMessageProducerFactory() {
-        Map<String, Object> configProps = getStringObjectMap();
-        return new DefaultKafkaProducerFactory<>(configProps);
-    }
-
-    @Bean
-    public KafkaTemplate<String, VanillaOptionDTO> vanillaOptionKafkaTemplate() {
-        return new KafkaTemplate<>(vanillaOptionsProducerFactory());
-    }
-
-    @Bean
-    public KafkaTemplate<String, MarkerAndAddressReservationMessage> markerMessageKafkaTemplate() {
-        return new KafkaTemplate<>(markerMessageProducerFactory());
+    public KafkaTemplate<String, MarkerAndAddressReservationMessage> markerAndAddressReservationMessageKafkaTemplate() {
+        return new KafkaTemplate<>(markerAndAddressReservationMessageProducerFactory());
     }
 
     private Map<String, Object> getStringObjectMap() {
@@ -73,6 +49,5 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return configProps;
     }
-
 
 }

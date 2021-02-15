@@ -1,20 +1,39 @@
 package com.quantlogic.snapshot;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.quantlogic.common.entity.SnapshotAllocationMessage;
+import com.quantlogic.messaging.EngineRegMessageConsumer;
+import com.quantlogic.messaging.SnapshotAllocationMessageProducer;
 import com.quantlogic.mmap.MemoryMapManager;
 import com.quantlogic.repository.MemoryIndexRepository;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.mapping;
+import java.util.function.BiConsumer;
 
 @Component
 public class SnapshotWindowManager {
+
+    static class BackUpSnapshot {
+        long address;
+        int version;
+
+        public BackUpSnapshot(long address, int version) {
+            this.address = address;
+            this.version = version;
+        }
+    }
+
     private final MemoryMapManager memoryMapManager;
+    private final Cache<String, List<BackUpSnapshot>> prevSnapshot;
+    private final EngineRegMessageConsumer engineRegMessageConsumer;
+    private final SnapshotAllocationMessageProducer snapshotAllocationMessageProducer;
+    private final Map<Long, SnapshotAllocationMessage> snapshotAllocationMessageMap;
+    private final Set<Long> requestSentToEngines;
 
     public enum ParameterType {
         SPOT, VOLATILITY, YIELDCURVE
@@ -22,78 +41,108 @@ public class SnapshotWindowManager {
 
     private final Map<String, CompositeSnapshotWindow> taggedBucket;
     private final MemoryIndexRepository memoryIndexRepository;
-    private final Map<String, Set<Long>> tagAddressesMap;
 
     public SnapshotWindowManager(@Autowired MemoryIndexRepository memoryIndexRepository,
                                  @Autowired WindowConfig windowConfig,
-                                 @Autowired MemoryMapManager memoryMapManager) {
+                                 @Autowired MemoryMapManager memoryMapManager,
+                                 @Autowired EngineRegMessageConsumer engineRegMessageConsumer,
+                                 @Autowired SnapshotAllocationMessageProducer snapshotAllocationMessageProducer) {
         this.taggedBucket = new HashMap<>();
         String tags = windowConfig.getTags();
-        Arrays.stream(tags.split(",")).forEach(tag -> taggedBucket.put(tag, new CompositeSnapshotWindow()));
         this.memoryIndexRepository = memoryIndexRepository;
         this.memoryMapManager = memoryMapManager;
-        this.tagAddressesMap = Arrays.stream(tags.split(","))
-                .map(key -> memoryIndexRepository.getMemoryAddresses(key).stream()
-                        .map(address -> Pair.of(key, memoryMapManager.getStartAddress(address)))
-                ).flatMap(Stream::sorted)
-                .collect(Collectors.groupingBy(Pair::getLeft, mapping(Pair::getRight, Collectors.toSet())));
+        this.prevSnapshot = CacheBuilder.newBuilder().build();
+        this.engineRegMessageConsumer = engineRegMessageConsumer;
+        this.snapshotAllocationMessageProducer = snapshotAllocationMessageProducer;
+        this.snapshotAllocationMessageMap = new HashMap<>();
+        this.requestSentToEngines = new HashSet<>();
+        Arrays.stream(tags.split(",")).forEach(tag -> {
+            taggedBucket.put(tag, new CompositeSnapshotWindow());
+            this.prevSnapshot.put(tag, Lists.newArrayList());
+        });
+
     }
 
 
     public void addToBucket(ParameterType parameterType, String tag, String key, int version) {
-        Optional<Long> elem = tagAddressesMap.get(key).stream().filter(k -> memoryMapManager.getUsedAddresses().contains(k)).findAny();
         switch (parameterType) {
             case SPOT:
-                taggedBucket.get(tag).setSpotsnap(key, version, elem.isPresent());
+                taggedBucket.get(tag).setSpotsnap(key, version);
                 break;
             case VOLATILITY:
-                taggedBucket.get(tag).setVolsnap(key, version, elem.isPresent());
+                taggedBucket.get(tag).setVolsnap(key, version);
                 break;
             case YIELDCURVE:
-                taggedBucket.get(tag).setYieldCurveSnap(key, version, elem.isPresent());
+                taggedBucket.get(tag).setYieldCurveSnap(key, version);
                 break;
         }
     }
 
-    public void reserveAddress(int address, boolean free) {
-        if (free) {
-            memoryMapManager.markFree(address);
-        } else {
-            memoryMapManager.markUsed(address);
-        }
+    public void freeAddress(long addressLoc) {
+        requestSentToEngines.remove(addressLoc);
+    }
+
+    public void processWatermark() {
+        snapshotAllocationMessageMap.forEach((key, value) -> {
+            if(requestSentToEngines.contains(key)){
+                String topic = this.engineRegMessageConsumer.getTopic(key);
+                snapshotAllocationMessageProducer.sendAllocationMessage(value, topic);
+                requestSentToEngines.add(key);
+            }
+        });
     }
 
     public void closeBucket(String tag) {
+        processPreviousSnapshot(Objects.requireNonNull(this.prevSnapshot.getIfPresent(tag)));
         CompositeSnapshotWindow compositeSnapshotWindow = taggedBucket.get(tag);
+        Set<Long> rootAddressesFree = Sets.newHashSet();
         compositeSnapshotWindow
                 .getSpotsnap()
-                .entrySet()
-                .stream()
-                .filter(e -> compositeSnapshotWindow.getSpotKeys().contains(e.getKey()))
-                .forEach(e -> {
-                    memoryIndexRepository.getMemoryAddresses(e.getKey()).forEach(memadd -> memoryMapManager.set(memadd, e.getValue()));
-                });
+                .forEach(processEntry(compositeSnapshotWindow, rootAddressesFree, tag));
+
         compositeSnapshotWindow
                 .getVolsnap()
-                .entrySet()
-                .stream()
-                .filter(e -> compositeSnapshotWindow.getVolKeys().contains(e.getKey()))
-                .forEach(e -> {
-                    memoryIndexRepository.getMemoryAddresses(e.getKey()).forEach(memadd -> memoryMapManager.set(memadd, e.getValue()));
-                });
+                .forEach(processEntry(compositeSnapshotWindow, rootAddressesFree, tag));
+
 
         compositeSnapshotWindow
                 .getYieldCurveSnap()
-                .entrySet()
-                .stream()
-                .filter(e -> compositeSnapshotWindow.getYieldCurveKeys().contains(e.getKey()))
-                .forEach(e -> {
-                    memoryIndexRepository.getMemoryAddresses(e.getKey()).forEach(memadd -> memoryMapManager.set(memadd, e.getValue()));
-                });
+                .forEach(processEntry(compositeSnapshotWindow, rootAddressesFree, tag));
 
+        rootAddressesFree.forEach(memoryMapManager::markUsed);
         compositeSnapshotWindow.closeWindow();
+    }
 
+    private BiConsumer<String, Integer> processEntry(CompositeSnapshotWindow compositeSnapshotWindow,
+                                                     Set<Long> rootAddressesFree, String tag) {
+        return (key, value) -> memoryIndexRepository.getMemoryAddresses(key).forEach(address -> {
+            long startAddress = memoryMapManager.getStartAddress(address);
+            if (compositeSnapshotWindow.getSpotKeys().contains(key)) {
+                if (memoryMapManager.isFree(startAddress)) {
+                    rootAddressesFree.add(startAddress);
+                    memoryMapManager.set(address, value);
+                    this.snapshotAllocationMessageMap.putIfAbsent(startAddress, new SnapshotAllocationMessage());
+                    SnapshotAllocationMessage snapshotAllocationMessage = this.snapshotAllocationMessageMap.get(startAddress);
+                    snapshotAllocationMessage.setStartMemAddress(startAddress);
+                    snapshotAllocationMessage.setDone(false);
+                } else {
+                    List<BackUpSnapshot> backupList = prevSnapshot.getIfPresent(tag);
+                    Objects.requireNonNull(backupList).add(new BackUpSnapshot(address, value));
+                }
+            }
+        });
+    }
 
+    // if previous snpashot was not processes in last cycle - do so now
+    // this is the default behaviour
+    private void processPreviousSnapshot(List<BackUpSnapshot> backupList) {
+        for (Iterator<BackUpSnapshot> iterator = backupList.iterator(); iterator.hasNext(); ) {
+            BackUpSnapshot next = iterator.next();
+            if (memoryMapManager.isFree(memoryMapManager.getStartAddress(next.address))) {
+                memoryMapManager.set(next.address, next.version);
+                iterator.remove();
+            }
+        }
     }
 
 }

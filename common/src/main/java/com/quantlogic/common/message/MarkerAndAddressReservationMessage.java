@@ -1,13 +1,13 @@
 package com.quantlogic.common.message;
 
-public class MarkerAndAddressResevationMessage {
+public class MarkerAndAddressReservationMessage {
     private long snapshotTime;
     private String id;
     private int version;
     private boolean closeBucket;
     private boolean reserveAddress;
     private boolean freeAddress;
-    private int addressLoc;
+    private long addressLoc;
 
     public long getSnapshotTime() {
         return snapshotTime;
@@ -57,11 +57,11 @@ public class MarkerAndAddressResevationMessage {
         this.freeAddress = freeAddress;
     }
 
-    public int getAddressLoc() {
+    public long getAddressLoc() {
         return addressLoc;
     }
 
-    public void setAddressLoc(int addressLoc) {
+    public void setAddressLoc(long addressLoc) {
         this.addressLoc = addressLoc;
     }
 }
