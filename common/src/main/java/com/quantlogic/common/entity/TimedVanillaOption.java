@@ -190,4 +190,25 @@ public class TimedVanillaOption implements NamedTimedEntity {
         return Objects.hash(strike, underlying, riskFreeRate, dividendYield, volatility, settlementDate, maturity,
                 dayCount, optionType, excerciseType, tickerSymbol, version, shardId, snapshotTime, name);
     }
+
+    @Override
+    public String toString() {
+        return "TimedVanillaOption{" +
+                "strike=" + strike +
+                ", underlying='" + underlying + '\'' +
+                ", riskFreeRate=" + riskFreeRate +
+                ", dividendYield=" + dividendYield +
+                ", volatility=" + volatility +
+                ", settlementDate=" + settlementDate +
+                ", maturity=" + maturity +
+                ", dayCount=" + dayCount +
+                ", optionType=" + optionType +
+                ", excerciseType=" + excerciseType +
+                ", tickerSymbol='" + tickerSymbol + '\'' +
+                ", version=" + version +
+                ", shardId=" + shardId +
+                ", snapshotTime=" + snapshotTime +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

@@ -38,24 +38,21 @@ public class MarketDataConsumer {
         TimedBlackVarianceVolatility timedBlackVarianceVolatility = new TimedBlackVarianceVolatility(blackVarianceVolatilityDTO);
         long snapshotTime = System.currentTimeMillis();
         timedBlackVarianceVolatility.setSnapshotTime(snapshotTime);
-        this.blackVarianceVolDAO.save(new CacheKey(blackVarianceVolatilityDTO.getVersion(),
-                snapshotTime, blackVarianceVolatilityDTO.getName()), timedBlackVarianceVolatility);
+        this.blackVarianceVolDAO.save(new CacheKey(blackVarianceVolatilityDTO.getVersion(), blackVarianceVolatilityDTO.getName()), timedBlackVarianceVolatility);
     }
 
     private void saveSpotPrice(SpotPriceDTO spotPriceDTO){
         SpotPrice spotPrice = new SpotPrice(spotPriceDTO);
         long snapshotTime = System.currentTimeMillis();
         spotPrice.setSnapshotTime(snapshotTime);
-        this.spotPriceDAO.save(new CacheKey(spotPriceDTO.getVersion(),
-                System.currentTimeMillis(), spotPriceDTO.getName()), spotPrice);
+        this.spotPriceDAO.save(new CacheKey(spotPriceDTO.getVersion(), spotPriceDTO.getName()), spotPrice);
     }
 
     private void saveVanillaOption(VanillaOptionDTO vanillaOptionDTO){
         TimedVanillaOption timedVanillaOption = new TimedVanillaOption(vanillaOptionDTO);
         long snapshotTime = System.currentTimeMillis();
         timedVanillaOption.setSnapshotTime(snapshotTime);
-        this.vanillaOptionDAO.save(new CacheKey(vanillaOptionDTO.getVersion(),
-                System.currentTimeMillis(), vanillaOptionDTO.getName()), timedVanillaOption);
+        this.vanillaOptionDAO.save(new CacheKey(vanillaOptionDTO.getVersion(), vanillaOptionDTO.getName()), timedVanillaOption);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${spot.topic.name}" , partitions = { "0"} ), containerFactory = "spotPriceKafkaListenerContainerFactory")

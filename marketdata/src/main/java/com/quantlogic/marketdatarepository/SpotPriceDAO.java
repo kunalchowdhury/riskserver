@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SpotPriceDAO implements MarketDataDAO<CacheKey, SpotPrice>{
 
-    private final RedisTemplate<CacheKey, SpotPrice> redisTemplate;
+    private final RedisTemplate<String, SpotPrice> redisTemplate;
     private final MarkerMessageProducer markerMessageProducer;
 
-    public SpotPriceDAO(@Autowired RedisTemplate<CacheKey, SpotPrice> redisTemplate,
+    public SpotPriceDAO(@Autowired RedisTemplate<String, SpotPrice> redisTemplate,
                         @Autowired MarkerMessageProducer markerMessageProducer) {
         this.redisTemplate = redisTemplate;
         this.markerMessageProducer = markerMessageProducer;
@@ -27,7 +28,8 @@ public class SpotPriceDAO implements MarketDataDAO<CacheKey, SpotPrice>{
 
     @Override
     public void save(CacheKey key, SpotPrice value) {
-        this.redisTemplate.opsForValue().set(key, value);
+        HashOperations<String, CacheKey, SpotPrice> hashOps = this.redisTemplate.opsForHash();
+        hashOps.put("SPOTS", key, value);
         this.markerMessageProducer.sendMarker(value.getSnapshotTime(), value.getName(), value.getVersion(), true);
 
     }

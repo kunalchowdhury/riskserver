@@ -20,7 +20,7 @@ public class MarketDataProducer {
         this.vanillaOptionDTOKafkaTemplate = vanillaOptionDTOKafkaTemplate;
     }
 
-    enum MarketDataEntityType{ SPOT, BLACKVOL, VANILLAOPTION}
+    public enum MarketDataEntityType{ SPOT, BLACKVOL, VANILLAOPTION}
 
     private final KafkaTemplate<String, SpotPriceDTO> spotPriceDTOKafkaTemplate;
 
@@ -52,7 +52,10 @@ public class MarketDataProducer {
         int hash = message.getName().hashCode();
         switch (type){
             case SPOT:
+                System.out.println("about to send spot");
+        //        spotPriceDTOKafkaTemplate.send(spotPriceTopicName, (SpotPriceDTO)message );
                 spotPriceDTOKafkaTemplate.send(spotPriceTopicName, hash % spotPartitionCount, name, (SpotPriceDTO) message);
+                System.out.println("DONE.");
                 break;
             case BLACKVOL:
                 blackVarianceVolatilityDTOKafkaTemplate.send(blackVarianceVolTopicName, hash % blackVarianceVolPartitionCount, name, (BlackVarianceVolatilityDTO) message);

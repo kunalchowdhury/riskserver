@@ -14,6 +14,7 @@ import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
@@ -39,30 +40,33 @@ public class RedisConfig {
     }
 
    @Bean(name = "spotPriceTemplate")
-    public RedisTemplate<CacheKey, SpotPrice> customSpotPriceTemplate(@Autowired RedisConnectionFactory factory) {
-        RedisTemplate<CacheKey, SpotPrice> template = new RedisTemplate<>();
-        template.setKeySerializer(new FastJsonRedisSerializer<>(CacheKey.class));
-        template.setValueSerializer(new SpotPriceRedisSerializer());
+    public RedisTemplate<String, SpotPrice> customSpotPriceTemplate(@Autowired RedisConnectionFactory factory) {
+        RedisTemplate<String, SpotPrice> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new FastJsonRedisSerializer<>(CacheKey.class));
+        template.setHashValueSerializer(new SpotPriceRedisSerializer());
         template.setConnectionFactory(factory);
         template.afterPropertiesSet();
         return template;
     }
 
     @Bean(name = "blackVarianceVolPriceTemplate")
-    public RedisTemplate<CacheKey, TimedBlackVarianceVolatility> customBlackVarianceVolTemplate(@Autowired RedisConnectionFactory factory) {
-        RedisTemplate<CacheKey, TimedBlackVarianceVolatility> template = new RedisTemplate<>();
-        template.setKeySerializer(new FastJsonRedisSerializer<>(CacheKey.class));
-        template.setValueSerializer(new BlackVarianceVolRedisSerializer());
+    public RedisTemplate<String, TimedBlackVarianceVolatility> customBlackVarianceVolTemplate(@Autowired RedisConnectionFactory factory) {
+        RedisTemplate<String, TimedBlackVarianceVolatility> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new FastJsonRedisSerializer<>(CacheKey.class));
+        template.setHashValueSerializer(new BlackVarianceVolRedisSerializer());
         template.setConnectionFactory(factory);
         template.afterPropertiesSet();
         return template;
     }
 
     @Bean(name = "vanillaOptionTemplate")
-    public RedisTemplate<CacheKey, TimedVanillaOption> customVanillaOptionTemplate(@Autowired RedisConnectionFactory factory) {
-        RedisTemplate<CacheKey, TimedVanillaOption> template = new RedisTemplate<>();
-        template.setKeySerializer(new FastJsonRedisSerializer<>(CacheKey.class));
-        template.setValueSerializer(new VanillaOptionsRedisSerializer());
+    public RedisTemplate<String, TimedVanillaOption> customVanillaOptionTemplate(@Autowired RedisConnectionFactory factory) {
+        RedisTemplate<String, TimedVanillaOption> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new FastJsonRedisSerializer<>(CacheKey.class));
+        template.setHashValueSerializer(new VanillaOptionsRedisSerializer());
         template.setConnectionFactory(factory);
         template.afterPropertiesSet();
         return template;

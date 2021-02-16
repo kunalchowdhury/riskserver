@@ -11,6 +11,9 @@ public class SpotPriceDTO implements DTOEntity{
     private double close;
     private int version;
 
+    public SpotPriceDTO() {
+    }
+
     public SpotPriceDTO(String ticker, double mid, double hi, double lo, double open, double close, int version) {
         this.ticker = ticker;
         this.mid = mid;

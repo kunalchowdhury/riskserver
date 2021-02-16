@@ -15,6 +15,9 @@ public class SpotPrice implements NamedTimedEntity {
     private String name;
     private int version;
 
+    public SpotPrice() {
+    }
+
     public SpotPrice(SpotPriceDTO spotPriceDTO) {
         this(spotPriceDTO.getTicker(), spotPriceDTO.getMid(), spotPriceDTO.getHi(), spotPriceDTO.getLo(),
                 spotPriceDTO.getOpen(), spotPriceDTO.getClose(), spotPriceDTO.getName(), spotPriceDTO.getVersion());
@@ -119,5 +122,21 @@ public class SpotPrice implements NamedTimedEntity {
     @Override
     public int hashCode() {
         return Objects.hash(ticker, mid, hi, lo, open, close, snapshotTime, name, version);
+    }
+
+
+    @Override
+    public String toString() {
+        return "SpotPrice{" +
+                "ticker='" + ticker + '\'' +
+                ", mid=" + mid +
+                ", hi=" + hi +
+                ", lo=" + lo +
+                ", open=" + open +
+                ", close=" + close +
+                ", snapshotTime=" + snapshotTime +
+                ", name='" + name + '\'' +
+                ", version=" + version +
+                '}';
     }
 }

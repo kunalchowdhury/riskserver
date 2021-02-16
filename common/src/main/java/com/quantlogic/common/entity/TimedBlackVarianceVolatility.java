@@ -140,4 +140,20 @@ public class TimedBlackVarianceVolatility implements NamedTimedEntity {
         result = 31 * result + Arrays.hashCode(vols);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "TimedBlackVarianceVolatility{" +
+                "valuationDate=" + valuationDate +
+                ", calendar=" + calendar +
+                ", expirations=" + Arrays.toString(expirations) +
+                ", strikes=" + Arrays.toString(strikes) +
+                ", curDayCounter=" + curDayCounter +
+                ", vols=" + Arrays.toString(vols) +
+                ", version=" + version +
+                ", shardId=" + shardId +
+                ", snapshotTime=" + snapshotTime +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

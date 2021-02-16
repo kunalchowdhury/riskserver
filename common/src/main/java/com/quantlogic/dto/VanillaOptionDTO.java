@@ -18,6 +18,9 @@ public class VanillaOptionDTO implements DTOEntity {
     private int shardId;
     private String name;
 
+    public VanillaOptionDTO() {
+    }
+
     public VanillaOptionDTO(double strike,
                             String underlying,
                             double riskFreeRate,

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class BlackVarianceVolDAO implements MarketDataDAO<CacheKey, TimedBlackVarianceVolatility>{
 
-    private final RedisTemplate<CacheKey, TimedBlackVarianceVolatility> redisTemplate;
+    private final RedisTemplate<String, TimedBlackVarianceVolatility> redisTemplate;
     private final MarkerMessageProducer markerMessageProducer;
 
-    public BlackVarianceVolDAO(@Autowired RedisTemplate<CacheKey, TimedBlackVarianceVolatility> redisTemplate,
+    public BlackVarianceVolDAO(@Autowired RedisTemplate<String, TimedBlackVarianceVolatility> redisTemplate,
                                @Autowired MarkerMessageProducer markerMessageProducer) {
         this.redisTemplate = redisTemplate;
         this.markerMessageProducer = markerMessageProducer;
@@ -27,7 +28,8 @@ public class BlackVarianceVolDAO implements MarketDataDAO<CacheKey, TimedBlackVa
 
     @Override
     public void save(CacheKey key, TimedBlackVarianceVolatility value) {
-        this.redisTemplate.opsForValue().set(key, value);
+        HashOperations<String, CacheKey, TimedBlackVarianceVolatility> hashOps = this.redisTemplate.opsForHash();
+        hashOps.put("VOLS", key, value);
         this.markerMessageProducer.sendMarker(value.getSnapshotTime(), value.getName(), value.getVersion(), false);
     }
 

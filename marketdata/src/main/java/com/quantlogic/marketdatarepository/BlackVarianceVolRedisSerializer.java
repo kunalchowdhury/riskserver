@@ -16,19 +16,24 @@ public class BlackVarianceVolRedisSerializer implements RedisSerializer<TimedBla
     public BlackVarianceVolRedisSerializer() {
         this.blackVarianceVolSerializer = new BlackVarianceVolSerializer();
         this.kryo = new Kryo();
+        this.kryo.register(TimedBlackVarianceVolatility.class);
         this.output = new Output(1024);
     }
 
     @Override
     public byte[] serialize(TimedBlackVarianceVolatility blackVarianceVolatility) throws SerializationException {
-        this.output.reset();
         blackVarianceVolSerializer.write(this.kryo, this.output, blackVarianceVolatility);
-        return this.output.getBuffer();
+        byte[] buffer = this.output.getBuffer();
+        this.output.flush();
+        return buffer;
     }
 
     @Override
     public TimedBlackVarianceVolatility deserialize(byte[] bytes) throws SerializationException {
+        if(bytes == null){
+            return null;
+        }
         Input input = new Input(bytes, 0, bytes.length);
-        return kryo.readObject(input, TimedBlackVarianceVolatility.class);
+        return blackVarianceVolSerializer.read(kryo, input, TimedBlackVarianceVolatility.class);
     }
 }

@@ -16,19 +16,24 @@ public class VanillaOptionsRedisSerializer implements RedisSerializer<TimedVanil
     public VanillaOptionsRedisSerializer() {
         this.vanillaOptionSerializer = new VanillaOptionSerializer();
         this.kryo = new Kryo();
+        this.kryo.register(TimedVanillaOption.class);
         this.output = new Output(1024);
     }
 
     @Override
     public byte[] serialize(TimedVanillaOption vanillaOption) throws SerializationException {
-        this.output.reset();
         vanillaOptionSerializer.write(this.kryo, this.output, vanillaOption);
-        return this.output.getBuffer();
+        byte[] buffer = this.output.getBuffer();
+        this.output.flush();
+        return buffer;
     }
 
     @Override
     public TimedVanillaOption deserialize(byte[] bytes) throws SerializationException {
+        if(bytes == null){
+            return null;
+        }
         Input input = new Input(bytes, 0, bytes.length);
-        return kryo.readObject(input, TimedVanillaOption.class);
+        return vanillaOptionSerializer.read(kryo, input, TimedVanillaOption.class);
     }
 }
