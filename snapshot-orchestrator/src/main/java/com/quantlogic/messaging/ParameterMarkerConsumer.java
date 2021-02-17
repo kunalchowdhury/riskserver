@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import com.quantlogic.common.entity.EngineRegistrationMessage;
 import com.quantlogic.common.message.MarkerAndAddressReservationMessage;
 import com.quantlogic.common.message.Watermark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
@@ -23,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ParameterMarkerConsumer {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(ParameterMarkerConsumer.class);
     private final PublishSubject<MarkerAndAddressReservationMessage> publishSubject;
     private final EngineRegMessageConsumer engineRegMessageConsumer;
     private final LinkedBlockingQueue<MarkerAndAddressReservationMessage> blockingQueue;
@@ -84,7 +87,7 @@ public class ParameterMarkerConsumer {
 
     @KafkaListener(topics = "${address.reservation.topic}", groupId = "engineRegistration", containerFactory = "engineRegistrationMessageConcurrentKafkaListenerContainerFactory")
     public void listenEngineReservationMessage(EngineRegistrationMessage message) {
-        System.out.println("Received EngineRegistrationMessage in group 'engineRegistration': " + message);
+        LOGGER.info("Received EngineRegistrationMessage in group 'engineRegistration': {}" , message);
         engineRegMessageConsumer.exec(message);
     }
 }

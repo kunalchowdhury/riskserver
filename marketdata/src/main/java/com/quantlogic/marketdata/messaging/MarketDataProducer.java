@@ -4,6 +4,8 @@ import com.quantlogic.dto.BlackVarianceVolatilityDTO;
 import com.quantlogic.dto.DTOEntity;
 import com.quantlogic.dto.SpotPriceDTO;
 import com.quantlogic.dto.VanillaOptionDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MarketDataProducer {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(MarketDataProducer.class);
     public MarketDataProducer(@Autowired KafkaTemplate<String, SpotPriceDTO> spotPriceDTOKafkaTemplate,
                               @Autowired KafkaTemplate<String, BlackVarianceVolatilityDTO> blackVarianceVolatilityDTOKafkaTemplate,
                               @Autowired KafkaTemplate<String, VanillaOptionDTO> vanillaOptionDTOKafkaTemplate) {
@@ -52,18 +55,20 @@ public class MarketDataProducer {
         int hash = message.getName().hashCode();
         switch (type){
             case SPOT:
-                System.out.println("about to send spot");
-        //        spotPriceDTOKafkaTemplate.send(spotPriceTopicName, (SpotPriceDTO)message );
-                spotPriceDTOKafkaTemplate.send(spotPriceTopicName, hash % spotPartitionCount, name, (SpotPriceDTO) message);
-                System.out.println("DONE.");
+                spotPriceDTOKafkaTemplate.send(spotPriceTopicName, Math.abs(hash % spotPartitionCount) , name, (SpotPriceDTO) message);
+                LOGGER.info("Sent {} message to partition {} ", message, hash % spotPartitionCount);
                 break;
             case BLACKVOL:
-                blackVarianceVolatilityDTOKafkaTemplate.send(blackVarianceVolTopicName, hash % blackVarianceVolPartitionCount, name, (BlackVarianceVolatilityDTO) message);
+                blackVarianceVolatilityDTOKafkaTemplate.send(blackVarianceVolTopicName, Math.abs(hash % blackVarianceVolPartitionCount), name, (BlackVarianceVolatilityDTO) message);
+                LOGGER.info("Sent {} message to partition {} ", message, hash % blackVarianceVolPartitionCount);
                 break;
             case VANILLAOPTION:
-                vanillaOptionDTOKafkaTemplate.send(vanillaOptionTopicName, hash % vanillaOptionPartitionCount, name, (VanillaOptionDTO) message);
+                vanillaOptionDTOKafkaTemplate.send(vanillaOptionTopicName, Math.abs(hash % vanillaOptionPartitionCount), name, (VanillaOptionDTO) message);
+                LOGGER.info("Sent {} message to partition {} ", message, hash % vanillaOptionPartitionCount);
                 break;
         }
+
+
 
     }
 

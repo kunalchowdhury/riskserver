@@ -46,4 +46,15 @@ public class EngineRegistrationMessage {
     public void setYieldCurveIds(String yieldCurveIds) {
         this.yieldCurveIds = yieldCurveIds;
     }
+
+    @Override
+    public String toString() {
+        return "EngineRegistrationMessage{" +
+                "pid='" + pid + '\'' +
+                ", hostId='" + hostId + '\'' +
+                ", spotids='" + spotids + '\'' +
+                ", volIds='" + volIds + '\'' +
+                ", yieldCurveIds='" + yieldCurveIds + '\'' +
+                '}';
+    }
 }

@@ -10,6 +10,8 @@ import com.quantlogic.dto.VanillaOptionDTO;
 import com.quantlogic.marketdatarepository.BlackVarianceVolDAO;
 import com.quantlogic.marketdatarepository.SpotPriceDAO;
 import com.quantlogic.marketdatarepository.VanillaOptionDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MarketDataConsumer {
+
+    private final Logger logger = LoggerFactory.getLogger(MarketDataConsumer.class);
 
     private final BlackVarianceVolDAO blackVarianceVolDAO;
 
@@ -57,32 +61,32 @@ public class MarketDataConsumer {
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${spot.topic.name}" , partitions = { "0"} ), containerFactory = "spotPriceKafkaListenerContainerFactory")
     public void spotPriceListenerPartition0(SpotPriceDTO spotPriceDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received spot message: " + spotPriceDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", spotPriceDTO, partition);
         saveSpotPrice(spotPriceDTO);
 
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${spot.topic.name}" , partitions = { "1"} ), containerFactory = "spotPriceKafkaListenerContainerFactory")
     public void spotPriceListenerPartition1(SpotPriceDTO spotPriceDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received spot message: " + spotPriceDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", spotPriceDTO, partition);
         saveSpotPrice(spotPriceDTO);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${spot.topic.name}" , partitions = { "2"} ), containerFactory = "spotPriceKafkaListenerContainerFactory")
     public void spotPriceListenerPartition2(SpotPriceDTO spotPriceDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received spot message: " + spotPriceDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", spotPriceDTO, partition);
         saveSpotPrice(spotPriceDTO);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${vol.topic.name}" , partitions = { "0"} ), containerFactory = "blackVarianceVolKafkaListenerContainerFactory")
     public void blackVarianceVolListenerPartition0(BlackVarianceVolatilityDTO blackVarianceVolatilityDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received blackVarianceVolatilityDTO message: " + blackVarianceVolatilityDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", blackVarianceVolatilityDTO, partition);
         saveBlackVarianceVol(blackVarianceVolatilityDTO);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${vol.topic.name}" , partitions = { "1"} ), containerFactory = "blackVarianceVolKafkaListenerContainerFactory")
     public void blackVarianceVolListenerPartition1(BlackVarianceVolatilityDTO blackVarianceVolatilityDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received blackVarianceVolatilityDTO message: " + blackVarianceVolatilityDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", blackVarianceVolatilityDTO, partition);
         saveBlackVarianceVol(blackVarianceVolatilityDTO);
     }
 
@@ -94,19 +98,19 @@ public class MarketDataConsumer {
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${vanilla.option.topic.name}" , partitions = { "0"} ), containerFactory = "vanillaOptionKafkaListenerContainerFactory")
     public void vanillaOptionListenerPartition0(VanillaOptionDTO vanillaOptionDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received vanillaOptionDTO message: " + vanillaOptionDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", vanillaOptionDTO, partition);
         saveVanillaOption(vanillaOptionDTO);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${vanilla.option.topic.name}" , partitions = { "1"} ), containerFactory = "vanillaOptionKafkaListenerContainerFactory")
     public void vanillaOptionListenerPartition1(VanillaOptionDTO vanillaOptionDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received vanillaOptionDTO message: " + vanillaOptionDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", vanillaOptionDTO, partition);
         saveVanillaOption(vanillaOptionDTO);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${vanilla.option.topic.name}" , partitions = { "2"} ), containerFactory = "vanillaOptionKafkaListenerContainerFactory")
     public void vanillaOptionVolListenerPartition2(VanillaOptionDTO vanillaOptionDTO, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received vanillaOptionDTO message: " + vanillaOptionDTO+ " from partition "+partition);
+        logger.info("Received spot message: {} from partition {} ", vanillaOptionDTO, partition);
         saveVanillaOption(vanillaOptionDTO);
     }
 
