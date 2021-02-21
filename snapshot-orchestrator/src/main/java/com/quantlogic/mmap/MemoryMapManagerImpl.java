@@ -1,5 +1,9 @@
 package com.quantlogic.mmap;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import sun.misc.Unsafe;
 import sun.nio.ch.DirectBuffer;
@@ -14,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AccessController;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class MemoryMapManagerImpl implements MemoryMapManager{
+    private static final Logger LOGGER = LoggerFactory.getLogger(MemoryMapManagerImpl.class);
     private static Unsafe unsafe;
     private static final ByteOrder byteOrder;
     static {
@@ -62,10 +68,16 @@ public class MemoryMapManagerImpl implements MemoryMapManager{
     private static final String FILE_SUFFIX = ".dat";
     private final Map<Long, Long> rootAddresses;
     private final Map<Long, Boolean> usedAddressMap;
+    private final Map<String, MappedByteBuffer> mbfMap;
+    private final Map<String, String> cacheFileNameMap;
+    private final Map<String, Set<Integer>> usedLocations;
 
     public MemoryMapManagerImpl() {
         this.rootAddresses = new LinkedHashMap<>();
         this.usedAddressMap = new LinkedHashMap<>();
+        this.cacheFileNameMap = Maps.newConcurrentMap();
+        this.usedLocations = Maps.newConcurrentMap();
+        this.mbfMap = Maps.newConcurrentMap();
     }
 
     @Override
@@ -79,8 +91,28 @@ public class MemoryMapManagerImpl implements MemoryMapManager{
     }
 
     @Override
+    public void putInBuffer(String cacheId, int index, int version) {
+        mbfMap.get(cacheId).putInt(index, version);
+    }
+
+    @Override
+    public String getMappedFileName(String cacheId) {
+        return cacheFileNameMap.get(cacheId);
+    }
+
+    @Override
     public void markUsed(long memoryAddress) {
         usedAddressMap.put(memoryAddress, true);
+    }
+
+    @Override
+    public void markUsedInBuffer(String cacheId, int index) {
+        usedLocations.computeIfAbsent(cacheId, s -> Sets.newHashSet()).add(index);
+    }
+
+    @Override
+    public void markFreeInBuffer(String cacheId, int index) {
+        usedLocations.get(cacheId).remove(index);
     }
 
     @Override
@@ -91,6 +123,11 @@ public class MemoryMapManagerImpl implements MemoryMapManager{
     @Override
     public boolean isFree(long memoryAddress) {
         return !usedAddressMap.get(memoryAddress);
+    }
+
+    @Override
+    public boolean isFree(String cacheId, int idx) {
+        return !usedLocations.get(cacheId).contains(idx);
     }
 
     @Override
@@ -111,15 +148,19 @@ public class MemoryMapManagerImpl implements MemoryMapManager{
                 Files.createDirectory(path);
             }
             final String fileName = path.toAbsolutePath().toString()+ File.separator +"version_cache_" + cacheId + FILE_SUFFIX;
+            this.cacheFileNameMap.put(cacheId, fileName);
             RandomAccessFile cacheFile = new RandomAccessFile(fileName, "rw");
-            MappedByteBuffer mbf = cacheFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, (long) sz);
-            long rootAddress = ((DirectBuffer) mbf).address();
+            MappedByteBuffer byteBuffer = cacheFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, (long) sz);
+            this.mbfMap.put(cacheId, byteBuffer);
+            this.usedLocations.put(cacheId, new HashSet<>());
+            long rootAddress = ((DirectBuffer) byteBuffer).address();
             for (int i = 0; i < sz; i+=4) {
                 long key = rootAddress + i;
+                LOGGER.info("Root address set key {}, value {}", key, rootAddress);
                 this.rootAddresses.put(key, rootAddress);
                 this.usedAddressMap.put(key, false);
             }
-            return rootAddress;
+            return (long) sz;
 
         } catch (Exception e) {
             e.printStackTrace();

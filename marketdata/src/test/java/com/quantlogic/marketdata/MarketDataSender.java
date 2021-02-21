@@ -1,6 +1,5 @@
 package com.quantlogic.marketdata;
 
-import com.quantlogic.common.entity.CacheKey;
 import com.quantlogic.common.entity.SpotPrice;
 import com.quantlogic.common.entity.TimedVanillaOption;
 import com.quantlogic.dto.SpotPriceDTO;
@@ -36,8 +35,8 @@ public class MarketDataSender {
         System.out.println("saved record -> " +marketDataSender.redisTemplate.opsForHash().get("SPOTS", new CacheKey(4, "AAPL")));
         System.out.println("saved record -> " +marketDataSender.redisTemplate.opsForHash().get("SPOTS", new CacheKey(5, "AAPL")));
         System.out.println("saved record -> " +marketDataSender.redisTemplate.opsForHash().get("SPOTS", new CacheKey(6, "AAPL")));*/
-        System.out.println("saved record -> " +marketDataSender.redisTemplate.opsForHash().get("SPOTS", new CacheKey(9, "AAPL")));
-        System.out.println("saved record -> " +marketDataSender.vanillaOptionRedisTemplate.opsForHash().get("INSTRUMENTS", new CacheKey(1, "AAPL2M")));
+        //System.out.println("saved record -> " +marketDataSender.redisTemplate.opsForHash().get("SPOTS", new CacheKey(9, "AAPL")));
+        //System.out.println("saved record -> " +marketDataSender.vanillaOptionRedisTemplate.opsForHash().get("INSTRUMENTS", new CacheKey(1, "AAPL2M")));
 
 
 

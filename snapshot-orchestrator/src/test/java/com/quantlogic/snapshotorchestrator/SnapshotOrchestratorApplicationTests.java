@@ -47,7 +47,7 @@ class SnapshotOrchestratorApplicationTests {
         bean.memoryIndexRepository.unmapMemoryAddress("VOLKEY1");
         bean.memoryIndexRepository.mapMemoryAddress("VOLKEY1", "8188188");
         bean.memoryIndexRepository.mapMemoryAddress("VOLKEY1", "90901001");
-        Collection<Long> keys = bean.memoryIndexRepository.getMemoryAddresses("VOLKEY1");
-        Assertions.assertTrue(keys.containsAll(Sets.newSet(90901001L, 8188188L)));
+        Collection<String> keys = bean.memoryIndexRepository.getMemoryAddresses("VOLKEY1");
+        Assertions.assertTrue(keys.containsAll(Sets.newSet("90901001", "8188188")));
     }
 }

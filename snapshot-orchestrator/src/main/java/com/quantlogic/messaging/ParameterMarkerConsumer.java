@@ -31,6 +31,7 @@ public class ParameterMarkerConsumer {
     private final LinkedBlockingQueue<MarkerAndAddressReservationMessage> blockingQueue;
     private final WaterMarkEmittingStrategy[] waterMarkEmittingStrategy = new WaterMarkEmittingStrategy[]
             {WaterMarkEmittingStrategy.ALWAYS_TRUE};
+    private volatile boolean enginesInitialized;
 
     public ParameterMarkerConsumer(@Autowired ParameterMessageConsumer parameterMessageConsumer,
                                    @Autowired EngineRegMessageConsumer engineRegMessageConsumer) {
@@ -39,9 +40,13 @@ public class ParameterMarkerConsumer {
         this.blockingQueue = Queues.newLinkedBlockingQueue();
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         Set<MarkerAndAddressReservationMessage> set = Sets.newHashSet();
+        this.enginesInitialized = false;
         scheduledExecutorService.scheduleWithFixedDelay(() -> {
             set.clear();
             try {
+                if(!this.enginesInitialized) {
+                    this.enginesInitialized = this.engineRegMessageConsumer.waitTillInitialized();
+                }
                 Queues.drain(blockingQueue, set, blockingQueue.size(), 10, TimeUnit.SECONDS);
                 set.forEach(publishSubject::onNext);
                 Arrays.stream(waterMarkEmittingStrategy).forEach(st -> {
@@ -60,19 +65,19 @@ public class ParameterMarkerConsumer {
     // RxJava best practice - never call onNext from multiple threads
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${marker.topic}" , partitions = { "0"} ), containerFactory = "markerMessageKafkaListenerContainerFactory")
     public void markerListenerPartition0(MarkerAndAddressReservationMessage markerMessage, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received MarkerMessage message: " + markerMessage + " from partition " + partition);
+        LOGGER.info("Received MarkerMessage message: {} from partition {} " ,markerMessage, partition);
         putIntoQueue(markerMessage);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${marker.topic}" , partitions = { "1"} ), containerFactory = "markerMessageKafkaListenerContainerFactory")
     public void markerListenerPartition1(MarkerAndAddressReservationMessage markerMessage, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received MarkerMessage message: " + markerMessage + " from partition " + partition);
+        LOGGER.info("Received MarkerMessage message: {} from partition {} " ,markerMessage, partition);
         putIntoQueue(markerMessage);
     }
 
     @KafkaListener(topicPartitions = @TopicPartition(topic = "${marker.topic}" , partitions = { "2"} ), containerFactory = "markerMessageKafkaListenerContainerFactory")
     public void markerListenerPartition2(MarkerAndAddressReservationMessage markerMessage, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received MarkerMessage message: " + markerMessage + " from partition " + partition);
+        LOGGER.info("Received MarkerMessage message: {} from partition {} " ,markerMessage, partition);
         putIntoQueue(markerMessage);
     }
 

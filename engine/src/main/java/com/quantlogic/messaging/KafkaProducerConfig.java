@@ -1,6 +1,7 @@
 package com.quantlogic.messaging;
 
 import com.quantlogic.common.entity.EngineRegistrationMessage;
+import com.quantlogic.common.message.MarkerAndAddressReservationMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +27,21 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    @Bean
+    public ProducerFactory<String, MarkerAndAddressReservationMessage> engineMarkerAndAddressReservationProducerFactory() {
+        Map<String, Object> configProps = getStringObjectMap();
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
 
     @Bean
     public KafkaTemplate<String, EngineRegistrationMessage> engineRegistrationMessageKafkaTemplate() {
         return new KafkaTemplate<>(engineRegistrationMessageProducerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, MarkerAndAddressReservationMessage> engineMarkerAndAddressReservationMessage() {
+        return new KafkaTemplate<>(engineMarkerAndAddressReservationProducerFactory());
     }
 
     private Map<String, Object> getStringObjectMap() {

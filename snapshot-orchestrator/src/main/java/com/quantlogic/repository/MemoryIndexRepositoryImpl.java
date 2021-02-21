@@ -5,9 +5,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Repository
 @ComponentScan(basePackages = "com.quantlogic")
@@ -29,11 +29,8 @@ public class MemoryIndexRepositoryImpl implements MemoryIndexRepository{
     }
 
     @Override
-    public Collection<Long> getMemoryAddresses(String paramKey) {
-        return Objects.requireNonNull(this.template.opsForList().
-                range(paramKey, 0, Integer.MAX_VALUE))
-                .stream()
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
+    public List<String> getMemoryAddresses(String paramKey) {
+        return new ArrayList<>(Objects.requireNonNull(this.template.opsForList().
+                range(paramKey, 0, Integer.MAX_VALUE)));
     }
 }

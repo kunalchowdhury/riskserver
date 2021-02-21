@@ -149,7 +149,7 @@ public class TimedBlackVarianceVolatility implements NamedTimedEntity {
                 ", expirations=" + Arrays.toString(expirations) +
                 ", strikes=" + Arrays.toString(strikes) +
                 ", curDayCounter=" + curDayCounter +
-                ", vols=" + Arrays.toString(vols) +
+                ", vols=" + Arrays.deepToString(vols) +
                 ", version=" + version +
                 ", shardId=" + shardId +
                 ", snapshotTime=" + snapshotTime +

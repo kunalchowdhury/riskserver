@@ -6,6 +6,7 @@ import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
@@ -58,7 +59,28 @@ public class Test {
         });
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        PublishSubject<String> publishSubject = PublishSubject.create();
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        publishSubject.asObservable()
+                .observeOn(Schedulers.from(executor))
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        System.out.println(" -- > "+s);
+                    }
+                }).subscribe();
+        publishSubject.onNext("test");
+        Thread.sleep(3000);
+        publishSubject.onNext("test1");
+        Thread.sleep(3000);
+        publishSubject.onNext("test2");
+        Thread.sleep(3000);
+        publishSubject.onNext("test3");
+
+    }
+
+    public static void main3(String[] args) {
 //https://stackoverflow.com/questions/44984730/rxandroid-whats-the-difference-between-subscribeon-and-observeon/44985270#44985270
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleWithFixedDelay(new Runnable() {

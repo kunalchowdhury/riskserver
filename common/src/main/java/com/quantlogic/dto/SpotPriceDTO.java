@@ -1,5 +1,7 @@
 package com.quantlogic.dto;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class SpotPriceDTO implements DTOEntity{
@@ -10,6 +12,7 @@ public class SpotPriceDTO implements DTOEntity{
     private double open;
     private double close;
     private int version;
+    private List<Integer> dummy;
 
     public SpotPriceDTO() {
     }
@@ -22,6 +25,7 @@ public class SpotPriceDTO implements DTOEntity{
         this.open = open;
         this.close = close;
         this.version = version;
+        this.dummy = new ArrayList<>();
     }
 
     public String getTicker() {
@@ -83,6 +87,15 @@ public class SpotPriceDTO implements DTOEntity{
     @Override
     public String getName() {
         return this.ticker;
+    }
+
+
+    public List<Integer> getDummy() {
+        return dummy;
+    }
+
+    public void setDummy(List<Integer> dummy) {
+        this.dummy = dummy;
     }
 
     @Override

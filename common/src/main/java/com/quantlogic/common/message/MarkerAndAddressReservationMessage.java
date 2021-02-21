@@ -61,7 +61,22 @@ public class MarkerAndAddressReservationMessage {
         return addressLoc;
     }
 
+    @Override
+    public String toString() {
+        return "MarkerAndAddressReservationMessage{" +
+                "snapshotTime=" + snapshotTime +
+                ", id='" + id + '\'' +
+                ", version=" + version +
+                ", closeBucket=" + closeBucket +
+                ", reserveAddress=" + reserveAddress +
+                ", freeAddress=" + freeAddress +
+                ", addressLoc=" + addressLoc +
+                '}';
+    }
+
     public void setAddressLoc(long addressLoc) {
         this.addressLoc = addressLoc;
     }
+
+
 }

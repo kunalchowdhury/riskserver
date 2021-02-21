@@ -103,19 +103,19 @@ public class EntityTest {
         volMatrix.set(4, 3, 0.16037);
         volMatrix.set(4, 4, 0.16042);
 
-        Date todaysDate = new Date(15, Month.May, 1998);
-        Date settlementDate = new Date(17, Month.May, 1998);
+        Date todaysDate = new Date(22, Month.February, 2021);
+        Date settlementDate = new Date(24, Month.February, 2021);
         Settings.instance().setEvaluationDate(todaysDate);
 
-        Date maturity = new Date(17, Month.May, 1999);
+        Date maturity = new Date(24, Month.February, 2022);
         DayCounter dayCounter = new Actual365Fixed();
         Calendar calendar = new UnitedStates(UnitedStates.Market.NYSE);
 
 
 
-        DateVector expirations = new DateVector(new Date[]{new Date(20, Month.December, 2013),
-                new Date(17, Month.January, 2014), new Date(21, Month.March, 2014),
-                new Date(20, Month.June, 2014), new Date(19, Month.September, 2014)});
+        DateVector expirations = new DateVector(new Date[]{new Date(20, Month.December, 2026),
+                new Date(17, Month.January, 2027), new Date(21, Month.March, 2027),
+                new Date(20, Month.June, 2027), new Date(19, Month.September, 2027)});
 
         DoubleVector strikes = new DoubleVector(new double[]{1650.0, 1660.0, 1670.0, 1675.0, 1680.0});
 

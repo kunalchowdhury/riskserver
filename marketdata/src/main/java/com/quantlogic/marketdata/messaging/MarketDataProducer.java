@@ -68,9 +68,29 @@ public class MarketDataProducer {
                 break;
         }
 
-
-
     }
 
+    public void setSpotPriceTopicName(String spotPriceTopicName) {
+        this.spotPriceTopicName = spotPriceTopicName;
+    }
 
+    public void setBlackVarianceVolTopicName(String blackVarianceVolTopicName) {
+        this.blackVarianceVolTopicName = blackVarianceVolTopicName;
+    }
+
+    public void setVanillaOptionTopicName(String vanillaOptionTopicName) {
+        this.vanillaOptionTopicName = vanillaOptionTopicName;
+    }
+
+    public void setSpotPartitionCount(int spotPartitionCount) {
+        this.spotPartitionCount = spotPartitionCount;
+    }
+
+    public void setBlackVarianceVolPartitionCount(int blackVarianceVolPartitionCount) {
+        this.blackVarianceVolPartitionCount = blackVarianceVolPartitionCount;
+    }
+
+    public void setVanillaOptionPartitionCount(int vanillaOptionPartitionCount) {
+        this.vanillaOptionPartitionCount = vanillaOptionPartitionCount;
+    }
 }

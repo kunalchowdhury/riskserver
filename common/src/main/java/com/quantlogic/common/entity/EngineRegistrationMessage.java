@@ -1,11 +1,19 @@
 package com.quantlogic.common.entity;
 
+import java.util.UUID;
+
 public class EngineRegistrationMessage {
     private String pid;
     private String hostId;
     private String spotids;    // command separated spot ids
     private String volIds;      // comma separated vol ids
     private String yieldCurveIds;   // command separated yieldCurve Ids
+    private final String id;
+    private int engineSequence;
+
+    public EngineRegistrationMessage() {
+        this.id = UUID.randomUUID().toString();
+    }
 
     public String getPid() {
         return pid;
@@ -47,6 +55,18 @@ public class EngineRegistrationMessage {
         this.yieldCurveIds = yieldCurveIds;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public int getEngineSequence() {
+        return engineSequence;
+    }
+
+    public void setEngineSequence(int engineSequence) {
+        this.engineSequence = engineSequence;
+    }
+
     @Override
     public String toString() {
         return "EngineRegistrationMessage{" +
@@ -55,6 +75,8 @@ public class EngineRegistrationMessage {
                 ", spotids='" + spotids + '\'' +
                 ", volIds='" + volIds + '\'' +
                 ", yieldCurveIds='" + yieldCurveIds + '\'' +
+                ", id='" + id + '\'' +
+                ", engineSequence=" + engineSequence +
                 '}';
     }
 }

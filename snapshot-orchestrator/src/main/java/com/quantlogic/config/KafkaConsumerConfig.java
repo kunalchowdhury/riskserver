@@ -33,6 +33,7 @@ public class KafkaConsumerConfig {
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, MarkerAndAddressReservationMessage> markerMessageKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, MarkerAndAddressReservationMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConcurrency(3);
         factory.setConsumerFactory(markerMessageKafkaConsumerFactory());
         return factory;
     }

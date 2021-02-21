@@ -6,6 +6,9 @@ public class CacheKey {
     private int version;
     private String name;
 
+    public CacheKey() {
+    }
+
     public CacheKey(int version, String name) {
         this.version = version;
         this.name = name;

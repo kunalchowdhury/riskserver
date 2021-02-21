@@ -49,7 +49,7 @@ public class RedisConfig {
     MessageListenerAdapter messageListener() {
         return new MessageListenerAdapter((MessageListener) (message, bytes) -> {
             //in redis-cli : config set notify-keyspace-events KEA
-            System.out.println("Got message for ..."+message);
+            System.out.println("Got message for for cache persistence > "+message);
         });
     }
 
