@@ -42,4 +42,12 @@ public class CacheKey {
     public int hashCode() {
         return Objects.hash(version, name);
     }
+
+    @Override
+    public String toString() {
+        return "CacheKey{" +
+                "version=" + version +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

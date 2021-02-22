@@ -17,6 +17,9 @@ public class TimedBlackVarianceVolatility implements NamedTimedEntity {
     private long snapshotTime;
     private String name;
 
+    public TimedBlackVarianceVolatility() {
+    }
+
     public TimedBlackVarianceVolatility(BlackVarianceVolatilityDTO blackVarianceVolatilityDTO){
         this(blackVarianceVolatilityDTO.getValuationDate(), blackVarianceVolatilityDTO.getCalendar(),
                 blackVarianceVolatilityDTO.getExpirations(), blackVarianceVolatilityDTO.getStrikes(),

@@ -21,6 +21,9 @@ public class TimedVanillaOption implements NamedTimedEntity {
     private long snapshotTime;
     private String name;
 
+    public TimedVanillaOption() {
+    }
+
     public TimedVanillaOption(VanillaOptionDTO vanillaOptionDTO) {
         this(vanillaOptionDTO.getStrike(), vanillaOptionDTO.getUnderlying(), vanillaOptionDTO.getRiskFreeRate(),
                 vanillaOptionDTO.getDividendYield(), vanillaOptionDTO.getVolatility(),

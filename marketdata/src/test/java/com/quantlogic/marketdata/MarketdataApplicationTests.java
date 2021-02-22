@@ -60,18 +60,104 @@ class MarketdataApplicationTests {
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
-        MarketDataProducer producer = new MarketDataProducer(
+        MarketDataProducer marketDataProducer = new MarketDataProducer(
                 new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configProps)),
                 new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configProps)),
                 new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configProps)));
-        producer.setBlackVarianceVolPartitionCount(3);
-        producer.setSpotPartitionCount(3);
-        producer.setVanillaOptionPartitionCount(3);
-        producer.setSpotPriceTopicName("spot-prices");
-        producer.setBlackVarianceVolTopicName("vols");
-        producer.setVanillaOptionTopicName("instruments");
-        SpotPriceDTO spotPriceDTO = new SpotPriceDTO("Spot|AAPL", 1655.0, 1652.0, 1652.0, 1651.0, 1652.5, 17);
-        producer.sendMessageToPartition(MarketDataProducer.MarketDataEntityType.SPOT, spotPriceDTO);
+        marketDataProducer.setBlackVarianceVolPartitionCount(3);
+        marketDataProducer.setSpotPartitionCount(3);
+        marketDataProducer.setVanillaOptionPartitionCount(3);
+        marketDataProducer.setSpotPriceTopicName("spot-prices");
+        marketDataProducer.setBlackVarianceVolTopicName("vols");
+        marketDataProducer.setVanillaOptionTopicName("instruments");
+        SpotPriceDTO spotPriceDTO = new SpotPriceDTO("Spot|AAPL", 1650.1, 1652.0, 1652.0, 1651.0, 1652.5, 25);
+        marketDataProducer.sendMessageToPartition(MarketDataProducer.MarketDataEntityType.SPOT, spotPriceDTO);
+        Thread.sleep(100000);
+        if(b){
+            return;
+
+        }
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+
+
+        calendar.set(Calendar.DAY_OF_MONTH, 23);
+        calendar.set(Calendar.MONTH, 1);
+        calendar.set(Calendar.YEAR, 2021);
+        long settlementDate = calendar.getTimeInMillis();
+
+        calendar.set(Calendar.DAY_OF_MONTH, 23);
+        calendar.set(Calendar.MONTH, 1);
+        calendar.set(Calendar.YEAR, 2022);
+        long maturity = calendar.getTimeInMillis();
+
+
+        VanillaOptionDTO vanillaOptionDTO =
+                new VanillaOptionDTO(1656.0,
+                        "AAPL",
+                        0.06,
+                        0.00,
+                        0.2,
+                        settlementDate,
+                        maturity, (byte)2, (byte)1, (byte)1, "AAPL", 1, 21,  "AAPL2M" );
+        marketDataProducer.sendMessageToPartition(MarketDataProducer.MarketDataEntityType.VANILLAOPTION,  vanillaOptionDTO );
+
+
+        long[] expiratons = new long[5];
+
+        calendar.set(Calendar.DAY_OF_MONTH,  19);
+        calendar.set(Calendar.MONTH,  11);
+        calendar.set(Calendar.YEAR,  2026);
+
+        expiratons[0] = calendar.getTimeInMillis();
+
+        calendar.set(Calendar.DAY_OF_MONTH,  16);
+        calendar.set(Calendar.MONTH,  0);
+        calendar.set(Calendar.YEAR,  2027);
+
+        expiratons[1] = calendar.getTimeInMillis();
+
+        calendar.set(Calendar.DAY_OF_MONTH,  20);
+        calendar.set(Calendar.MONTH,  2);
+        calendar.set(Calendar.YEAR,  2027);
+
+        expiratons[2] = calendar.getTimeInMillis();
+
+        calendar.set(Calendar.DAY_OF_MONTH,  19);
+        calendar.set(Calendar.MONTH,  5);
+        calendar.set(Calendar.YEAR,  2027);
+
+        expiratons[3] = calendar.getTimeInMillis();
+
+        calendar.set(Calendar.DAY_OF_MONTH,  18);
+        calendar.set(Calendar.MONTH,  8);
+        calendar.set(Calendar.YEAR,  2027);
+
+        expiratons[4] = calendar.getTimeInMillis();
+
+
+        double[] strikes = new double[]{1650.1, 1660.0, 1670.0, 1675.0, 1680.0};
+        double[][] vols = new double[][]{
+                {0.15640,0.15433,0.16079,0.16394,0.17383},
+                {0.15343,0.15240,0.15804,0.16255,0.17303},
+                {0.15128,0.14888,0.15512,0.15944,0.17038},
+                {0.14798,0.14906,0.15522,0.16171,0.16156},
+                {0.14580,0.14576,0.15364,0.16037,0.16042}
+        };
+
+        calendar.set(Calendar.DAY_OF_MONTH,  22);
+        calendar.set(Calendar.MONTH,  1);
+        calendar.set(Calendar.YEAR,  2021);
+        long l = calendar.getTimeInMillis();
+
+
+        BlackVarianceVolatilityDTO blackVarianceVolatilityDTO = new BlackVarianceVolatilityDTO(l, (byte)1, expiratons,  strikes, (byte)2, vols, 21, 1, "Vol|AAPL|BLACKVOL_TEST" );
+        marketDataProducer.sendMessageToPartition(MarketDataProducer.MarketDataEntityType.BLACKVOL,  blackVarianceVolatilityDTO );
 
         Thread.sleep(100000);
     }
