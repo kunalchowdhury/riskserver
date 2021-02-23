@@ -86,7 +86,7 @@ public class SnapshotWindowManager {
     public void freeAddress(String cacheId, int addressLoc) {
         requestSentToEngines.computeIfPresent(cacheId, (s, integer) -> integer -1);
         LOGGER.info("  %%%% After free address for {} , size is {} %%%% ", cacheId, requestSentToEngines.get(cacheId));
-        if(requestSentToEngines.get(cacheId) == 0){
+        if(requestSentToEngines.get(cacheId) <= 0){ // receive more than one confirmation message due to any reason
             requestSentToEngines.remove(cacheId);
             memoryMapManager.markFreeInBuffer(cacheId, addressLoc);
         }
@@ -110,19 +110,16 @@ public class SnapshotWindowManager {
         Set<String> rootAddressesFree = Sets.newHashSet();
         compositeSnapshotWindow.getSpotKeys().forEach(s -> {
             memoryIndexRepository.getMemoryAddresses(s).forEach(address -> {
-                LOGGER.info("Looking for start address {} ", address);
                 Integer value = compositeSnapshotWindow.getSpotsnap().get(s);
                 processEntry(tag, rootAddressesFree, address, value);
             });
         });
-
         compositeSnapshotWindow.getVolKeys().forEach(s -> {
             memoryIndexRepository.getMemoryAddresses(s).forEach(address -> {
                 Integer value = compositeSnapshotWindow.getVolsnap().get(s);
                 processEntry(tag, rootAddressesFree, address, value);
             });
         });
-
         compositeSnapshotWindow.getYieldCurveKeys().forEach(s -> {
             memoryIndexRepository.getMemoryAddresses(s).forEach(address -> {
                 Integer value = compositeSnapshotWindow.getYieldCurveSnap().get(s);
@@ -138,14 +135,12 @@ public class SnapshotWindowManager {
                 Integer.parseInt(s.split(":")[1])));
         compositeSnapshotWindow.closeWindow();
     }
-
     private void processEntry(String tag, Set<String> rootAddressesFree, String address, Integer value) {
         String cacheId = address.split(":")[0];
         int index = Integer.parseInt(address.split(":")[1]);
-        LOGGER.info("CacheId {} , index {} , value{} ", cacheId, index, value);
         if(memoryMapManager.isFree(cacheId, index)){
             memoryMapManager.putInBuffer(cacheId, index, value);
-            LOGGER.info("***** -----------------  DONE CacheId {} , index {} , value{} -------------------********** ", cacheId, index, value);
+            LOGGER.info("*****------- DONE storing CacheId {},index {},value{} --------******* ", cacheId, index, value);
             rootAddressesFree.add(address);
             SnapshotAllocationMessage snapshotAllocationMessage =
                     this.snapshotAllocationMessageMapTemp.computeIfAbsent(address, s -> new SnapshotAllocationMessage());

@@ -70,7 +70,7 @@ class MarketdataApplicationTests {
         marketDataProducer.setSpotPriceTopicName("spot-prices");
         marketDataProducer.setBlackVarianceVolTopicName("vols");
         marketDataProducer.setVanillaOptionTopicName("instruments");
-        SpotPriceDTO spotPriceDTO = new SpotPriceDTO("Spot|AAPL", 1650.1, 1652.0, 1652.0, 1651.0, 1652.5, 25);
+        SpotPriceDTO spotPriceDTO = new SpotPriceDTO("Spot|AAPL", 1657.7, 1650.0, 1652.0, 1651.0, 1652.5, 30);
         marketDataProducer.sendMessageToPartition(MarketDataProducer.MarketDataEntityType.SPOT, spotPriceDTO);
         Thread.sleep(100000);
         if(b){

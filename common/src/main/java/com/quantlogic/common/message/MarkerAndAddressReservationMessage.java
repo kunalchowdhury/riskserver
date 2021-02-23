@@ -5,6 +5,8 @@ public class MarkerAndAddressReservationMessage {
     private String id;
     private int version;
     private boolean closeBucket;
+
+
     private boolean reserveAddress;
     private boolean freeAddress;
     private long addressLoc;

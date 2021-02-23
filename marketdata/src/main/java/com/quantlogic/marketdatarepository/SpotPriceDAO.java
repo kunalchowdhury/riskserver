@@ -34,8 +34,6 @@ public class SpotPriceDAO implements MarketDataDAO<CacheKey, SpotPrice>{
         HashOperations<String, CacheKey, SpotPrice> hashOps = this.redisTemplate.opsForHash();
         hashOps.put("SPOTS", key, value);
         LOGGER.info("Saved Spot {} with key {} ", value, key);
-        SpotPrice price = hashOps.get("SPOTS", key);
-        LOGGER.info("RETRIEVED Saved Spot {} with key {} ", price, key);
         this.markerMessageProducer.sendMarker(value.getSnapshotTime(), value.getName(), value.getVersion(), true);
 
     }

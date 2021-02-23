@@ -47,7 +47,8 @@ public class EngineRegistrationMessageProducer {
     public void sendEngineRegistrationMessage(EngineRegistrationMessage engineRegistrationMessage){
         kafkaTemplate.send(engineRegistrationMessageTopic, engineRegistrationMessage);
         this.latch.put(engineRegistrationMessage.getId(), new CountDownLatch(1));
-        LOGGER.info("----- Waiting to hear back from orchestrator for address confirmation for id {} ----- ", engineRegistrationMessage.getId());
+        LOGGER.info("----- Waiting to hear back from orchestrator for address confirmation for id {} ----- ",
+                engineRegistrationMessage.getId());
         try {
             this.latch.get(engineRegistrationMessage.getId()).await();
         } catch (InterruptedException e) {

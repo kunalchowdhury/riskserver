@@ -182,11 +182,14 @@ public class ValuationOrchestrator {
         LOGGER.info("Registering valuator with id {}", valuationExecutor.getId());
         this.valuatorRegistry.put(valuationExecutor.getId(), valuationExecutor);
         valuationExecutor.spotInterests().forEach(spotAddress ->
-                this.spotValuatorMap.computeIfAbsent(Pair.of(valuationExecutor.getCurEngineId(), spotAddress),aLong -> Sets.newHashSet()).add(valuationExecutor.getId()));
+                this.spotValuatorMap.computeIfAbsent(Pair.of(valuationExecutor.getCurEngineId(),
+                        spotAddress),aLong -> Sets.newHashSet()).add(valuationExecutor.getId()));
         valuationExecutor.volInterests().forEach(volAddress ->
-                this.volValuatorMap.computeIfAbsent(Pair.of(valuationExecutor.getCurEngineId(), volAddress), aLong -> Sets.newHashSet()).add(valuationExecutor.getId()));
+                this.volValuatorMap.computeIfAbsent(Pair.of(valuationExecutor.getCurEngineId(), volAddress),
+                        aLong -> Sets.newHashSet()).add(valuationExecutor.getId()));
         valuationExecutor.yieldCurveInterests().forEach(yieldCurveAddress ->
-                this.yieldValuatorMap.computeIfAbsent(Pair.of(valuationExecutor.getCurEngineId(), yieldCurveAddress), aLong -> Sets.newHashSet()).add(valuationExecutor.getId()));
+                this.yieldValuatorMap.computeIfAbsent(Pair.of(valuationExecutor.getCurEngineId(), yieldCurveAddress),
+                        aLong -> Sets.newHashSet()).add(valuationExecutor.getId()));
         LOGGER.info("Registration complete for valuator with id {}", valuationExecutor.getId());
     }
 }

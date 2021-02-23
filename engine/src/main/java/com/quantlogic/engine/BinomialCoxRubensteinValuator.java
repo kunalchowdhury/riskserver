@@ -111,18 +111,14 @@ public class BinomialCoxRubensteinValuator extends ValuationExecutor {
 
         LOGGER.info("Setting up vol");
         String volKeyFromRule = ruleRepo.getVolSurfaceKey(instrument.getName(), null);
-
         this.engineRegistrationMessage.setEngineSequence(engineConfig.getEngineId());
         this.engineRegistrationMessage.setSpotids(primarySpotKeyFromRule.split(",")[0]);
         this.engineRegistrationMessage.setVolIds(volKeyFromRule.split(",")[0]);
 
         LOGGER.info("Sending registration message {} ", engineRegistrationMessage);
         engineRegistrationMessageProducer.sendEngineRegistrationMessage(engineRegistrationMessage);
-
         setSpotParameters(primarySpotKeyFromRule);
         setVolParameters(volKeyFromRule);
-
-
         Date settlementDate = DateUtil.fromEpochMillis(instrument.getSettlementDate());
         prepareBlackScholesMertonProcess(settlementDate);
         PlainVanillaPayoff payoff = new PlainVanillaPayoff(OptionType.values()[instrument.getOptionType()].type,
